@@ -7,7 +7,7 @@ function Player(sprite, numRows, numFrames){
     this.width = this.sprite.width / this.numFrames; //may replace this.sprite.width with 1 to get 0.25 as coordinate;
     this.height = this.sprite.height / this.numRows;
     this.frames = this.createBitmap(this.sprite);
-    this.animation = new Animation(frames)
+    this.animation = new Animation(frames);
 
     Player.prototype.createBitmap = function (sprite){
         var currentFrames = [];
@@ -18,11 +18,10 @@ function Player(sprite, numRows, numFrames){
             }
         }
         return currentFrames;
-    }
+    };
 
     Player.prototype.update = function (){
         this.animation.update();
-    }
+    };
 
 }
-
