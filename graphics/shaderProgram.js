@@ -122,6 +122,8 @@ function ShaderProgram(gl, vsSource, fsSource) {
     this.aLocations.aTexCoord = gl.getAttribLocation(this.id, 'aTexCoord');
     this.aLocations.aColor = gl.getAttribLocation(this.id, 'aColor');
     this.aLocations.aRotation = gl.getAttribLocation(this.id, 'aRotation');
+    this.aLocations.aTPosition = gl.getAttribLocation(this.id, 'aTPosition');
+    this.aLocations.aTOrigin = gl.getAttribLocation(this.id, 'aTOrigin');
     this.aLocations.aTid = gl.getAttribLocation(this.id, 'aTid');
     this.uLocations.uPrMatrix = gl.getUniformLocation(this.id, 'uPrMatrix');
     this.uLocations.uVwMatrix = gl.getUniformLocation(this.id, 'uVwMatrix');

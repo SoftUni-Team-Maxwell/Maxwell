@@ -2,7 +2,7 @@
 function SpriteBatch(gl) {
   this.glContext = gl;
   var shader = gl.defaultShader;
-  var vertexComponents = 7;
+  var vertexComponents = 11;
   var vertexSize = vertexComponents * Float32Array.BYTES_PER_ELEMENT;
 
   var bufferData = new ArrayBuffer(vertexSize * 4);
@@ -23,11 +23,16 @@ function SpriteBatch(gl) {
     gl.enableVertexAttribArray(shader.aLocations.aTexCoord);
     gl.enableVertexAttribArray(shader.aLocations.aRotation);
     gl.enableVertexAttribArray(shader.aLocations.aColor);
+    gl.enableVertexAttribArray(shader.aLocations.aTPosition);
+    gl.enableVertexAttribArray(shader.aLocations.aTOrigin);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.VertexDataBuffer);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VertexDataBuffer);
     gl.vertexAttribPointer(shader.aLocations.aPosition, 3, gl.FLOAT, false, vertexSize, 0);
     gl.vertexAttribPointer(shader.aLocations.aTexCoord, 2, gl.FLOAT, false, vertexSize, 4 * 3);
     gl.vertexAttribPointer(shader.aLocations.aRotation, 1, gl.FLOAT, false, vertexSize, 4 * 5);
     gl.vertexAttribPointer(shader.aLocations.aColor, 4, gl.UNSIGNED_BYTE, true, vertexSize, 4 * 6);
+    gl.vertexAttribPointer(shader.aLocations.aTPosition, 2, gl.FLOAT, false, vertexSize, 4 * 7);
+    gl.vertexAttribPointer(shader.aLocations.aTOrigin, 2, gl.FLOAT, false, vertexSize, 4 * 9);
   };
 
 
@@ -35,75 +40,109 @@ function SpriteBatch(gl) {
     this.draw(sprite,sprite.position.x, sprite.position.y, sprite.width, sprite.height, sprite.rotation, 0xffffffff, sprite.position.z);
   };
 
-  this.draw = function(sprite, x, y, width, height, rotation, color, depth) {
+  this.draw = function(sprite, x, y, width, height, rotation, color, depth, originX, originY) {
     var index = 0;
-    vertexData[index++] = x;
-    vertexData[index++] = y;
+    vertexData[index++] = 0;
+    vertexData[index++] = 0;
     vertexData[index++] = depth;
     vertexData[index++] = 0.0;
     vertexData[index++] = 0.0;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
-
-    vertexData[index++] = x + width;
+    vertexData[index++] = x;
     vertexData[index++] = y;
+    vertexData[index++] = originX || 0.0;
+    vertexData[index++] = originY || 0.0;
+
+    vertexData[index++] = 0 + width;
+    vertexData[index++] = 0;
     vertexData[index++] = depth;
     vertexData[index++] = 1.0;
     vertexData[index++] = 0.0;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
+    vertexData[index++] = x;
+    vertexData[index++] = y;
+    vertexData[index++] = originX || 0.0;
+    vertexData[index++] = originY || 0.0;
 
-    vertexData[index++] = x + width;
-    vertexData[index++] = y + height;
+    vertexData[index++] = 0 + width;
+    vertexData[index++] = 0 + height;
     vertexData[index++] = depth;
     vertexData[index++] = 1;
     vertexData[index++] = 1;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
-
     vertexData[index++] = x;
-    vertexData[index++] = y + height;
+    vertexData[index++] = y;
+    vertexData[index++] = originX || 0.0;
+    vertexData[index++] = originY || 0.0;
+
+    vertexData[index++] = 0;
+    vertexData[index++] = 0 + height;
     vertexData[index++] = depth;
     vertexData[index++] = 0;
     vertexData[index++] = 1.0;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
+    vertexData[index++] = x;
+    vertexData[index++] = y;
+    vertexData[index++] = originX || 0.0;
+    vertexData[index++] = originY || 0.0;
 
     this._render(sprite.texture);
   };
 
-  this.drawTexture = function(texture, sourceRect, destinationRect, rotation, color, depth) {
+  this.drawTexture = function(texture, sourceRect, destinationRect, rotation, color, depth, originX, originY) {
 
     var index = 0;
-    vertexData[index++] = destinationRect.x;
-    vertexData[index++] = destinationRect.y;
+    vertexData[index++] = 0;
+    vertexData[index++] = 0;
     vertexData[index++] = depth;
     vertexData[index++] = sourceRect.x;
     vertexData[index++] = sourceRect.y;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
-    vertexData[index++] = destinationRect.x + destinationRect.width;
+    vertexData[index++] = destinationRect.x;
     vertexData[index++] = destinationRect.y;
-    vertexData[index++] = depth;
-    vertexData[index++] = sourceRect.x + sourceRect.width;
-    vertexData[index++] = sourceRect.y;
-    vertexData[index++] = rotation;
-    vertexColors[index++] = color;
-    vertexData[index++] = destinationRect.x + destinationRect.width;
-    vertexData[index++] = destinationRect.y + destinationRect.height;
-    vertexData[index++] = depth;
-    vertexData[index++] = sourceRect.x + sourceRect.width;
-    vertexData[index++] = sourceRect.y + sourceRect.height;
-    vertexData[index++] = rotation;
-    vertexColors[index++] = color;
+    vertexData[index++] = originX || 0.0;
+    vertexData[index++] = originY || 0.0;
 
+    vertexData[index++] = destinationRect.width;
+    vertexData[index++] = 0;
+    vertexData[index++] = depth;
+    vertexData[index++] = sourceRect.x + sourceRect.width;
+    vertexData[index++] = sourceRect.y;
+    vertexData[index++] = rotation;
+    vertexColors[index++] = color;
     vertexData[index++] = destinationRect.x;
-    vertexData[index++] = destinationRect.y + destinationRect.height;
+    vertexData[index++] = destinationRect.y;
+    vertexData[index++] = originX || 0.0;
+    vertexData[index++] = originY || 0.0;
+
+    vertexData[index++] = destinationRect.width;
+    vertexData[index++] = destinationRect.height;
+    vertexData[index++] = depth;
+    vertexData[index++] = sourceRect.x + sourceRect.width;
+    vertexData[index++] = sourceRect.y + sourceRect.height;
+    vertexData[index++] = rotation;
+    vertexColors[index++] = color;
+    vertexData[index++] = destinationRect.x;
+    vertexData[index++] = destinationRect.y;
+    vertexData[index++] = originX || 0.0;
+    vertexData[index++] = originY || 0.0;
+
+    vertexData[index++] = 0;
+    vertexData[index++] = destinationRect.height;
     vertexData[index++] = depth;
     vertexData[index++] = sourceRect.x;
     vertexData[index++] = sourceRect.y + sourceRect.height;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
+    vertexData[index++] = destinationRect.x;
+    vertexData[index++] = destinationRect.y;
+    vertexData[index++] = originX || 0.0;
+    vertexData[index++] = originY || 0.0;
 
     this._render(texture);
   };

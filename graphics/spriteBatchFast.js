@@ -1,10 +1,12 @@
-// TODO(Inspix): Unfinished;
+// TODO(Inspix): Unfinished.. Goal is to pack multiple uses of same textures into one draw call;
+//               If I can figure out the problem with the sampler2D arrays that seem to be limited
+//               to 16 active textures at once in WebGL.
 
 function SpriteBatchFast(glContext) {
   this.glContext = glContext;
   var gl = glContext;
   var shader = gl.defaultShader;
-  
+
   var MAXSPRITES = 1000;
   /* PositionX, PositionY, PositionZ, UVx, UVy, Rotation, Color     */
   var vertexComponents = 7;
