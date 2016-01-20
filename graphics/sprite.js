@@ -81,6 +81,7 @@ function Sprite(gl, vec3Pos, vec2size, texture, texCoords, colors) {
     var positionLoc = shader.aLocations.aPosition;
     var colorLoc = shader.aLocations.aColor;
 
+
     if(this.texture){
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.texture.id);

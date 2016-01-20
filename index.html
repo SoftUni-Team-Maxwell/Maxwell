@@ -10,6 +10,43 @@
     </style>
   </head>
   <body>
+
+    <script id="vshader" type="x-shader">
+      attribute vec3 aPosition;
+      attribute vec4 aColor;
+      attribute vec2 aTexCoord;
+      attribute float aRotation;
+      attribute float aTid;
+      varying vec4 vColor;
+      varying vec2 vTexCoord;
+      varying float vTid;
+      uniform mat4 uPrMatrix;
+      uniform mat4 uVwMatrix;
+      uniform mat4 uModelMatrix;
+      void main(){
+        vColor = aColor;
+        vTid = aTid;
+        vTexCoord = aTexCoord;
+        float rot = aRotation;
+        gl_Position = uPrMatrix * uVwMatrix * uModelMatrix * vec4(aPosition,1.0);
+      }
+    </script>
+    <script id="fshader" type="x-shader">
+    precision mediump float;
+    varying float vTid;
+    varying vec4 vColor;
+    varying vec2 vTexCoord;
+    uniform bool useTexturing;
+    uniform sampler2D uSampler;
+    void main(){
+      vec4 c = vec4(1.0,1.0,1.0,1.0);
+      if(useTexturing){
+       c = texture2D(uSampler,vTexCoord);
+      }
+      gl_FragColor = vColor * c;
+    }
+
+    </script>
     <p>For now everthing is in a different file, later on we can combine them.</p>
     <canvas id="webgl-canvas" width="1024" height="768">
       Oops ... your browser is from the stone age... Please update...
@@ -17,10 +54,13 @@
     <script src="graphics/texture.js" charset="utf-8"></script>
     <script src="graphics/sprite.js" charset="utf-8"></script>
     <script src="graphics/shaderProgram.js" charset="utf-8"></script>
+    <script src="graphics/spriteBatch.js" charset="utf-8"></script>
+    <script src="graphics/spriteBatchFast.js" charset="utf-8"></script>
     <script src="graphics/quad.js" charset="utf-8"></script>
     <script src="graphics/webglUtils.js" charset="utf-8"></script>
     <script src="math/vec2.js" charset="utf-8"></script>
     <script src="math/vec3.js" charset="utf-8"></script>
+    <script src="math/rect.js" charset="utf-8"></script>
     <script src="math/mat4.js" charset="utf-8"></script>
     <script src="math/random.js" charset="utf-8"></script>
     <script src="main.js" charset="utf-8"></script>

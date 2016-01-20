@@ -2,14 +2,19 @@ var defaultVS = [
   'attribute vec3 aPosition;',
   'attribute vec4 aColor;',
   'attribute vec2 aTexCoord;',
+  'attribute float aRotation;',
+  'attribute float tid;',
   'varying vec4 vColor;',
   'varying vec2 vTexCoord;',
+  'varying float vTid;',
   'uniform mat4 uPrMatrix;',
   'uniform mat4 uVwMatrix;',
   'uniform mat4 uModelMatrix;',
   'void main(){',
   'vColor = aColor;',
+  'vTid = tid;',
   'vTexCoord = aTexCoord;',
+  'float rot = aRotation;',
   'gl_Position = uPrMatrix * uVwMatrix * uModelMatrix * vec4(aPosition,1.0);',
   '}',
 ].join('\n');
@@ -18,12 +23,15 @@ var defaultFS = [
   'precision mediump float;',
   'varying vec4 vColor;',
   'varying vec2 vTexCoord;',
+  'varying float vTid;',
   'uniform bool useTexturing;',
-  'uniform sampler2D uSampler;',
+  'uniform sampler2D uSampler[16];',
   'void main(){',
   'vec4 c = vec4(1.0,1.0,1.0,1.0);',
-  'if(useTexturing)',
-  ' c = texture2D(uSampler,vTexCoord);',
+  'if(useTexturing){',
+  ' int id = int(vTid + 0.5);',
+  ' c = texture2D(uSampler[id],vTexCoord);',
+  '}',
   'gl_FragColor = vColor * c;',
   '}'
 ].join('\n');
@@ -34,12 +42,13 @@ function ShaderProgram(gl, vsSource, fsSource) {
   this.glContext = gl;
   var makeDefault = false;
   if (!vsSource) {
-    vsSource = String(defaultVS);
+
+    vsSource =  document.getElementById('vshader').textContent;  //String(defaultVS);
     console.log('No Vertex Shader source supplied, creating default program');
     makeDefault = true;
   }
   if (!fsSource) {
-    fsSource = String(defaultFS);
+    fsSource = document.getElementById('fshader').textContent; //String(defaultFS);
     console.log('No Fragment Shader source supplied, creating default program');
     makeDefault = true;
   }
@@ -103,7 +112,7 @@ function ShaderProgram(gl, vsSource, fsSource) {
   gl.linkProgram(this.id);
 
   if (!gl.getProgramParameter(this.id, gl.LINK_STATUS)) {
-    throw "Shader Program initialization failed:" + gl.getProgramInfoLog(this.id);
+    throw gl.getProgramInfoLog(this.id);
   }
 
   this.aLocations = {};
@@ -112,6 +121,8 @@ function ShaderProgram(gl, vsSource, fsSource) {
     this.aLocations.aPosition = gl.getAttribLocation(this.id, 'aPosition');
     this.aLocations.aTexCoord = gl.getAttribLocation(this.id, 'aTexCoord');
     this.aLocations.aColor = gl.getAttribLocation(this.id, 'aColor');
+    this.aLocations.aRotation = gl.getAttribLocation(this.id, 'aRotation');
+    this.aLocations.aTid = gl.getAttribLocation(this.id, 'aTid');
     this.uLocations.uPrMatrix = gl.getUniformLocation(this.id, 'uPrMatrix');
     this.uLocations.uVwMatrix = gl.getUniformLocation(this.id, 'uVwMatrix');
     this.uLocations.uModelMatrix = gl.getUniformLocation(this.id, 'uModelMatrix');
