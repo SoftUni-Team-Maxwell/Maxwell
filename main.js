@@ -41,8 +41,8 @@ function init(){
 
 }
 
-var row = 0.0;
-var col = 0.0;
+var row = 0.75;
+var col = 0.75;
 var accum = 0;
 var cooldown = 5;
 // NOTE(Inspix): Pseudo gameloop, just for testing, everything in this file is temporary.
@@ -65,21 +65,24 @@ function drawScene(){
   batch.drawSprite(background2);
   batch.drawSprite(ground);
   batch.drawSprite(ground2);
-  batch.drawTexture(playerSheet,new Rect(col,row,0.25,0.25),new Rect(400,200,200,200),accum++,0xffffffff,1,100,100,true);
+  batch.drawTexture(playerSheet,new Rect(col,row,0.25,0.25),new Rect(400,200,200,200),accum,0xffffffff,1,100,100,false);
   batch.end();
   // NOTE(Inspix): Inplace animation, just for testing, should be easily moved in its own object.
   // NOTE(Inspix): Rotation and image flip is not yet implemented.
   if (--cooldown < 0) {
     cooldown = 5;
-    col += 0.25;
-    if (col >= 1.0) {
-      col = 0;
-      row += 0.25;
-      if (row >= 1) {
-        row = 0;
-      }
-    }
+    col -= 0.25;
+
   }
+  if (col < 0) {
+    col = 0.75;
+    row -= 0.25;
+  }
+  if (row < 0) {
+    row = 0.75;
+  }
+
+
 
   if (ground2.position.x<=0) {
       ground.position.x += canvas.width;
