@@ -64,6 +64,15 @@ var col = 0.75;
 var accum = 0;
 var cooldown = 5;
 
+//jumping
+var minY = 80;
+var maxY = 560;
+var jumpDistance = 50;
+var startedAt, finishedAt;
+var currentY = minY;
+var jumping = false;
+var falling = false;
+
 // NOTE(Inspix): Pseudo gameloop, just for testing, everything in this file is temporary.
 function drawScene(){
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -79,12 +88,20 @@ function drawScene(){
   ground.position.x-=5;
   ground2.position.x-=5;
 
+  //NOTE(Bozhidar) just test for jumping;
+  this.onclick = function(){
+    console.log("JUMP");
+    jumping = true;
+    startedAt = currentY;
+    finishedAt = currentY + jumpDistance;
+  };
+
   batch.begin();
   batch.drawSprite(background);
   batch.drawSprite(background2);
   batch.drawSprite(ground);
   batch.drawSprite(ground2);
-  batch.drawTexture(playerSheet,new Rect(col,row,0.25,0.25),new Rect(100,80,100,100),0,0xffffffff,1,50,50,true);
+  batch.drawTexture(playerSheet,new Rect(col,row,0.25,0.25),new Rect(100,currentY,100,100),0,0xffffffff,1,50,50,true);
   if (particleEngine)
     particleEngine.draw(batch);
   batch.end();
@@ -101,6 +118,27 @@ function drawScene(){
       if (row >= 1.0) {
         row = 0;
       }
+    }
+  }
+
+  //Handle jumping
+  if(jumping===true){
+
+    if(currentY<finishedAt&&currentY<maxY){
+      currentY+=2;
+      console.log(currentY);
+    }
+    else{
+      jumping=false;
+      falling=true;
+    }
+  }else if(falling){
+    if(currentY>minY){
+      currentY-=5;
+    }
+    else{
+      currentY = minY;
+      falling=false;
     }
   }
 
