@@ -2,7 +2,8 @@ var gl;
 var canvas;
 var background,background2,ground,ground2,playerSheet;
 var batch;
-
+var particleEngine;
+var mousePosition = new Vec2(0,0);
 document.addEventListener("DOMContentLoaded",init);
 
 window.onerror = function(msg,url,line){
@@ -16,14 +17,25 @@ function init(){
   gl = initWebGL(canvas);
   gl.defaultShader.setUniformMat4(new Mat4().createOrtho(0,canvas.width,canvas.height,0,-100,1000), gl.defaultShader.uLocations.uPrMatrix);
   batch = new SpriteBatch(gl);
+
   var backgroundImg = new Image();
   backgroundImg.src = "textures/bg.png";
+  var bubbleImg = new Image();
+  bubbleImg.src = "textures/bubble.png";
+  bubbleImg.onload = function(){
+    var bubbleTexture = new Texture(gl,bubbleImg);
+    console.log(bubbleTexture);
+    particleEngine = new ParticleEngine(gl,bubbleTexture,50);
+    particleEngine.minWidth = 10;
+    particleEngine.maxWidth = 50;
+    particleEngine.life = 25;
+  };
   var groundImg = new Image();
   groundImg.src='textures/grass.png';
   var lavaImg = new Image();
   lavaImg.src = 'textures/lava.png';
   var playerImg = new Image();
-  playerImg.src = 'textures/playerSprite.png';
+  playerImg.src = 'textures/playerSprite2.png';
   // NOTE(Inspix): The sprites should be made after the image is loaded,
   //               Thats why i use the onload callback to be sure.
   backgroundImg.onload = function(){
@@ -39,12 +51,19 @@ function init(){
     drawScene();
   };
 
+  canvas.addEventListener('mousemove', function(e) {
+    var rect = canvas.getBoundingClientRect();
+    mousePosition.x = e.clientX - rect.left;
+    mousePosition.y = rect.bottom - e.clientY;
+  });
+
 }
 
 var row = 0.0;
-var col = 0.0;
+var col = 0.75;
 var accum = 0;
 var cooldown = 5;
+
 // NOTE(Inspix): Pseudo gameloop, just for testing, everything in this file is temporary.
 function drawScene(){
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -65,21 +84,33 @@ function drawScene(){
   batch.drawSprite(background2);
   batch.drawSprite(ground);
   batch.drawSprite(ground2);
-  batch.drawTexture(playerSheet,new Rect(col,row,0.25,0.25),new Rect(400,200,200,200),accum++,0xffffffff,1,100,100,true);
+  batch.drawTexture(playerSheet,new Rect(col,row,0.25,0.25),new Rect(100,80,100,100),0,0xffffffff,1,50,50,true);
+  if (particleEngine)
+    particleEngine.draw(batch);
+
   batch.end();
+
   // NOTE(Inspix): Inplace animation, just for testing, should be easily moved in its own object.
   // NOTE(Inspix): Rotation and image flip is not yet implemented.
   if (--cooldown < 0) {
     cooldown = 5;
-    col += 0.25;
-    if (col >= 1.0) {
-      col = 0;
+
+    col -= 0.25;
+    if (col < 0.0) {
+      col = 0.75;
+
       row += 0.25;
-      if (row >= 1) {
+      if (row >= 1.0) {
         row = 0;
       }
     }
   }
+
+  if (particleEngine){
+    particleEngine.Generate(mousePosition.x, mousePosition.y);
+    particleEngine.Update(5);
+  }
+
 
   if (ground2.position.x<=0) {
       ground.position.x += canvas.width;

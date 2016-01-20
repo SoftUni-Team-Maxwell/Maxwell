@@ -33,12 +33,39 @@ function Vec3(a,b,c){
     }
   };
 
+  this.multiplyScalar = function(scalar){
+    if (isNaN(scalar)) {
+      return;
+    }
+    this._x *= scalar;
+    this._y *= scalar;
+    this._z *= scalar;
+  };
+
   this.divide = function(other){
     if (other instanceof Vec3) {
       this._x /= other.x;
       this._y /= other.y;
       this._z /= other.z;
     }
+  };
+
+  this.divideScalar = function(scalar){
+    if (isNaN(scalar) || scalar === 0.0) {
+      console.error('Vector3 scalar divide by zero or NaN');
+      return this;
+    }
+    this._x /= scalar;
+    this._y /= scalar;
+    this._z /= scalar;
+  };
+
+  this.divideScalarCopy = function(scalar){
+      if (isNaN(scalar) || scalar === 0.0) {
+        console.error('Vector3 scalar divide by zero or NaN');
+        return this;
+      }
+      return new Vec2(this._x / scalar, this._y / scalar, this._z / scalar);
   };
 
   this.addCopy = function(other){
@@ -60,6 +87,13 @@ function Vec3(a,b,c){
       var result = new Vec3(this._x * other.x, this._y * other.y, this._z * other.z);
       return result;
     }
+  };
+
+  this.multiplyScalarCopy = function(scalar){
+      if (isNaN(scalar)) {
+        return;
+      }
+      return new Vec3(this._x * scalar, this._y * scalar, this._z * scalar);
   };
 
   this.divideCopy = function(other){
@@ -94,4 +128,27 @@ Vec3.prototype = {
     if (isNaN(value)) return;
     this._z = value;
   }
+};
+
+Vec3.prototype.dot = function(other) {
+  if (other instanceof Vec3) {
+    return this._x * other.x + this._y * other.y + this._z * other.z;
+  }
+};
+
+Vec3.prototype.length = function() {
+  if (other instanceof Vec3) {
+    return Math.sqrt(this.dot(this));
+  }
+};
+
+Vec3.prototype.normalize = function() {
+  var length = this.length;
+  if (length === 0.0) {
+    return;
+  }
+  this._x /= length;
+  this._y /= length;
+  this._z /= length;
+  return this;
 };

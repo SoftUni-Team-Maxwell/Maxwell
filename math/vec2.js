@@ -5,6 +5,7 @@ function Vec2(a,b){
 
   this._x = a;
   this._y = b;
+
   this.add = function(other){
     if (other instanceof Vec2) {
       this._x += other.x;
@@ -26,11 +27,27 @@ function Vec2(a,b){
     }
   };
 
+  this.multiplyScalar = function(scalar){
+    if (isNaN(scalar)) {
+      return;
+    }
+    this._x *= scalar;
+    this._y *= scalar;
+  };
+
   this.divide = function(other){
     if (other instanceof Vec2) {
       this._x /= other.x;
       this._y /= other.y;
     }
+  };
+
+  this.divideScalar = function(scalar){
+    if (isNaN(scalar) || scalar === 0.0) {
+      return;
+    }
+    this._x /= scalar;
+    this._y /= scalar;
   };
 
   this.addCopy = function(other){
@@ -54,12 +71,28 @@ function Vec2(a,b){
     }
   };
 
+  this.multiplyScalarCopy = function(scalar){
+      if (isNaN(scalar)) {
+        return;
+      }
+      var result = new Vec2(this._x * scalar, this._y * scalar);
+      return result;
+  };
+
   this.divideCopy = function(other){
     if (other instanceof Vec2) {
       var result = new Vec2(this._x / other.x, this._y / other.y);
       return result;
     }
   };
+
+  this.divideScalarCopy = function(scalar){
+      if (isNaN(scalar) || scalar === 0.0) {
+        return;
+      }
+      return new Vec2(this._x / scalar, this._y / scalar);
+  };
+
 
   this.toArray = function(){
     return new Float32Array([x,y]);
@@ -81,4 +114,24 @@ Vec2.prototype = {
     if (isNaN(value)) return;
     this._y = value;
   }
+};
+
+Vec2.prototype.dot = function(other) {
+  if (other instanceof Vec2) {
+    return this._x * other.x + this._y * other.y;
+  }
+};
+
+Vec2.prototype.length = function() {
+  return Math.sqrt(this.dot(this));
+};
+
+Vec2.prototype.normalize = function() {
+  var length = this.length();
+  if (length === 0.0) {
+    return;
+  }
+  this._x /= length;
+  this._y /= length;
+  return this;
 };

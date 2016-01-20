@@ -15,13 +15,15 @@
       attribute vec3 aPosition;
       attribute vec4 aColor;
       attribute vec2 aTexCoord;
-      attribute float aRotation;
       attribute vec2 aTPosition;
       attribute vec2 aTOrigin;
+      attribute float aRotation;
       attribute float aTid;
+
       varying vec4 vColor;
       varying vec2 vTexCoord;
       varying float vTid;
+
       uniform mat4 uPrMatrix;
       uniform mat4 uVwMatrix;
       uniform mat4 uModelMatrix;
@@ -68,19 +70,24 @@
         vec3 rotated = RotateVector(vec3(aPosition.xy - aTOrigin,aPosition.z), aRotation);
         rotated.xy += aTOrigin;
         rotated += vec3(aTPosition,0);
+
         vColor = aColor;
         vTid = aTid;
         vTexCoord = aTexCoord;
+
         gl_Position = uPrMatrix * uVwMatrix * uModelMatrix * vec4(rotated,1.0);
       }
     </script>
     <script id="fshader" type="x-shader">
     precision mediump float;
+
     varying float vTid;
     varying vec4 vColor;
     varying vec2 vTexCoord;
+
     uniform bool useTexturing;
     uniform sampler2D uSampler;
+
     void main(){
       vec4 c = vec4(1.0,1.0,1.0,1.0);
       if(useTexturing){
@@ -101,6 +108,8 @@
     <script src="graphics/spriteBatchFast.js" charset="utf-8"></script>
     <script src="graphics/quad.js" charset="utf-8"></script>
     <script src="graphics/webglUtils.js" charset="utf-8"></script>
+    <script src="graphics/particle.js" charset="utf-8"></script>
+    <script src="graphics/particleEngine.js" charset="utf-8"></script>
     <script src="math/vec2.js" charset="utf-8"></script>
     <script src="math/vec3.js" charset="utf-8"></script>
     <script src="math/rect.js" charset="utf-8"></script>

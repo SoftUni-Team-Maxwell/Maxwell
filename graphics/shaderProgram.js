@@ -73,6 +73,16 @@ function ShaderProgram(gl, vsSource, fsSource) {
       this.glContext.uniform1i(loc, value);
   };
 
+  this.setUniform2f = function(value, loc) {
+      if (value instanceof Vec2) {
+        if (!inUse) {
+          this.useProgram();
+        }
+        this.glContext.uniform2f(loc, value.x,value.y);
+      }
+
+  };
+
   this.isInUse = function() {
     return inUse;
   };
