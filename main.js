@@ -65,7 +65,7 @@ function drawScene(){
   batch.drawSprite(background2);
   batch.drawSprite(ground);
   batch.drawSprite(ground2);
-  batch.drawTexture(playerSheet,new Rect(col,row,0.25,0.25),new Rect(400,200,200,200),accum++,0xffffffff,1,100,100);
+  batch.drawTexture(playerSheet,new Rect(col,row,0.25,0.25),new Rect(400,200,200,200),accum++,0xffffffff,1,100,100,true);
   batch.end();
   // NOTE(Inspix): Inplace animation, just for testing, should be easily moved in its own object.
   // NOTE(Inspix): Rotation and image flip is not yet implemented.

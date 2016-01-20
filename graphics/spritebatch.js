@@ -36,17 +36,45 @@ function SpriteBatch(gl) {
   };
 
 
-  this.drawSprite = function(sprite) {
-    this.draw(sprite,sprite.position.x, sprite.position.y, sprite.width, sprite.height, sprite.rotation, 0xffffffff, sprite.position.z);
+  this.drawSprite = function(sprite,flipX) {
+    this.draw(sprite,sprite.position.x, sprite.position.y, sprite.width, sprite.height, sprite.rotation, 0xffffffff, sprite.position.z,0,0,flipX);
   };
 
-  this.draw = function(sprite, x, y, width, height, rotation, color, depth, originX, originY) {
+  this.draw = function(sprite, x, y, width, height, rotation, color, depth, originX, originY,flipX) {
     var index = 0;
+    var uVx0;
+    var uVy0;
+    var uVx1;
+    var uVy1;
+    var uVx2;
+    var uVy2;
+    var uVx3;
+    var uVy3;
+
+    if (flipX) {
+      uVx0 = 1.0;
+      uVy0 = 0.0;
+      uVx1 = 0.0;
+      uVy1 = 0.0;
+      uVx2 = 0.0;
+      uVy2 = 1.0;
+      uVx3 = 1.0;
+      uVy3 = 1.0;
+    }else {
+      uVx0 = 0.0;
+      uVy0 = 0.0;
+      uVx1 = 1.0;
+      uVy1 = 0.0;
+      uVx2 = 1.0;
+      uVy2 = 1.0;
+      uVx3 = 0.0;
+      uVy3 = 1.0;
+    }
     vertexData[index++] = 0;
     vertexData[index++] = 0;
     vertexData[index++] = depth;
-    vertexData[index++] = 0.0;
-    vertexData[index++] = 0.0;
+    vertexData[index++] = uVx0;
+    vertexData[index++] = uVy0;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
     vertexData[index++] = x;
@@ -57,8 +85,8 @@ function SpriteBatch(gl) {
     vertexData[index++] = 0 + width;
     vertexData[index++] = 0;
     vertexData[index++] = depth;
-    vertexData[index++] = 1.0;
-    vertexData[index++] = 0.0;
+    vertexData[index++] = uVx1;
+    vertexData[index++] = uVy1;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
     vertexData[index++] = x;
@@ -69,8 +97,8 @@ function SpriteBatch(gl) {
     vertexData[index++] = 0 + width;
     vertexData[index++] = 0 + height;
     vertexData[index++] = depth;
-    vertexData[index++] = 1;
-    vertexData[index++] = 1;
+    vertexData[index++] = uVx2;
+    vertexData[index++] = uVy2;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
     vertexData[index++] = x;
@@ -81,8 +109,8 @@ function SpriteBatch(gl) {
     vertexData[index++] = 0;
     vertexData[index++] = 0 + height;
     vertexData[index++] = depth;
-    vertexData[index++] = 0;
-    vertexData[index++] = 1.0;
+    vertexData[index++] = uVx3;
+    vertexData[index++] = uVy3;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
     vertexData[index++] = x;
@@ -93,14 +121,42 @@ function SpriteBatch(gl) {
     this._render(sprite.texture);
   };
 
-  this.drawTexture = function(texture, sourceRect, destinationRect, rotation, color, depth, originX, originY) {
-
+  this.drawTexture = function(texture, sourceRect, destinationRect, rotation, color, depth, originX, originY,flipX) {
     var index = 0;
+
+    var uVx0;
+    var uVy0;
+    var uVx1;
+    var uVy1;
+    var uVx2;
+    var uVy2;
+    var uVx3;
+    var uVy3;
+
+    if (flipX) {
+      uVx0 = sourceRect.x + sourceRect.width;
+      uVy0 = sourceRect.y;
+      uVx1 = sourceRect.x;
+      uVy1 = sourceRect.y;
+      uVx2 = sourceRect.x;
+      uVy2 = sourceRect.y + sourceRect.height;
+      uVx3 = sourceRect.x + sourceRect.width;
+      uVy3 = sourceRect.y + sourceRect.height;
+    }else {
+      uVx0 = sourceRect.x;
+      uVy0 = sourceRect.y;
+      uVx1 = sourceRect.x + sourceRect.width;
+      uVy1 = sourceRect.y;
+      uVx2 = sourceRect.x + sourceRect.width;
+      uVy2 = sourceRect.y + sourceRect.height;
+      uVx3 = sourceRect.x;
+      uVy3 = sourceRect.y + sourceRect.height;
+    }
     vertexData[index++] = 0;
     vertexData[index++] = 0;
     vertexData[index++] = depth;
-    vertexData[index++] = sourceRect.x;
-    vertexData[index++] = sourceRect.y;
+    vertexData[index++] = uVx0;
+    vertexData[index++] = uVy0;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
     vertexData[index++] = destinationRect.x;
@@ -111,8 +167,8 @@ function SpriteBatch(gl) {
     vertexData[index++] = destinationRect.width;
     vertexData[index++] = 0;
     vertexData[index++] = depth;
-    vertexData[index++] = sourceRect.x + sourceRect.width;
-    vertexData[index++] = sourceRect.y;
+    vertexData[index++] = uVx1;
+    vertexData[index++] = uVy1;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
     vertexData[index++] = destinationRect.x;
@@ -123,8 +179,8 @@ function SpriteBatch(gl) {
     vertexData[index++] = destinationRect.width;
     vertexData[index++] = destinationRect.height;
     vertexData[index++] = depth;
-    vertexData[index++] = sourceRect.x + sourceRect.width;
-    vertexData[index++] = sourceRect.y + sourceRect.height;
+    vertexData[index++] = uVx2;
+    vertexData[index++] = uVy2;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
     vertexData[index++] = destinationRect.x;
@@ -135,8 +191,8 @@ function SpriteBatch(gl) {
     vertexData[index++] = 0;
     vertexData[index++] = destinationRect.height;
     vertexData[index++] = depth;
-    vertexData[index++] = sourceRect.x;
-    vertexData[index++] = sourceRect.y + sourceRect.height;
+    vertexData[index++] = uVx3;
+    vertexData[index++] = uVy3;
     vertexData[index++] = rotation;
     vertexColors[index++] = color;
     vertexData[index++] = destinationRect.x;
