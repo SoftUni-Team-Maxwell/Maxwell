@@ -32,14 +32,20 @@ function generateToots(x,y){
   var count = this.maxCount;
 
   var width = getRandomInt(this.minWidth,this.maxWidth);
-  var dirX = getRandomInt(-50,0) / 100.0;
+  var dirX = getRandomInt(-100,-50) / 100.0;
   var dirY = getRandomInt(-100,0) / 100.0;
   var directionNormalized = new Vec2(dirX,dirY);
   directionNormalized.normalize();
+  var colorR = getRandomInt(0,255);
+  var colorG = getRandomInt(0,255);
+  var colorB = getRandomInt(0,255);
+  var colorA = 155;
 
+  var color = (colorA << 24 ) | (colorB << 16) | (colorG << 8) | colorR;
+  console.log(color.toString(16));
   //function Particle(x,y,width,height,vec2direction,life,color){
 
-  var p = new Particle(_x,_y,width,width,directionNormalized,this.life,0xff00aa00);
+  var p = new Particle(_x,_y,width,width,directionNormalized,this.life,color);
   particles.push(p);
   return true;
 }
@@ -58,10 +64,10 @@ function init(){
     var bubbleTexture = new Texture(gl,bubbleImg);
     console.log(bubbleTexture);
     particleEngine = new ParticleEngine(gl,bubbleTexture,50);
-    tootParticles = new ParticleEngine(gl,bubbleTexture,25);
+    tootParticles = new ParticleEngine(gl,bubbleTexture,50);
     tootParticles.minWidth = 5;
     tootParticles.maxWidth = 25;
-    tootParticles.life = 25;
+    tootParticles.life = 50;
     tootParticles.generationMethod = generateToots;
     particleEngine.minWidth = 10;
     particleEngine.maxWidth = 50;
@@ -185,7 +191,7 @@ function drawScene(){
   }
 
   if (particleEngine){
-    tootParticles.Update(10);
+    tootParticles.Update(3);
     particleEngine.Generate(mousePosition.x, mousePosition.y);
     particleEngine.Update(5);
   }
