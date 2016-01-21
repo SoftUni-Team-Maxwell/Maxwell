@@ -66,12 +66,21 @@ var cooldown = 5;
 
 //jumping
 var minY = 80;
-var maxY = 560;
-var jumpDistance = 50;
-var startedAt, finishedAt;
+var maxY = 660;
 var currentY = minY;
 var jumping = false;
 var falling = false;
+
+
+document.body.onmousedown = function() {
+  falling=false;
+  jumping=true;
+
+};
+document.body.onmouseup = function() {
+  falling=true;
+  jumping=false;
+};
 
 // NOTE(Inspix): Pseudo gameloop, just for testing, everything in this file is temporary.
 function drawScene(){
@@ -88,13 +97,7 @@ function drawScene(){
   ground.position.x-=5;
   ground2.position.x-=5;
 
-  //NOTE(Bozhidar) just test for jumping;
-  this.onclick = function(){
-    console.log("JUMP");
-    jumping = true;
-    startedAt = currentY;
-    finishedAt = currentY + jumpDistance;
-  };
+
 
   batch.begin();
   batch.drawSprite(background);
@@ -124,9 +127,8 @@ function drawScene(){
   //Handle jumping
   if(jumping===true){
 
-    if(currentY<finishedAt&&currentY<maxY){
-      currentY+=2;
-      console.log(currentY);
+    if(currentY<maxY){
+      currentY+=7;
     }
     else{
       jumping=false;
@@ -134,7 +136,7 @@ function drawScene(){
     }
   }else if(falling){
     if(currentY>minY){
-      currentY-=5;
+      currentY-=7;
     }
     else{
       currentY = minY;
