@@ -3,6 +3,7 @@ var canvas;
 var background,background2,ground,ground2,playerSheet;
 var batch;
 var particleEngine;
+var tootParticles;
 var mousePosition = new Vec2(0,0);
 document.addEventListener("DOMContentLoaded",init);
 
@@ -11,6 +12,37 @@ window.onerror = function(msg,url,line){
   alert(url + '(' + line + '):' + msg);
 };
 
+
+function generateToots(x,y){
+  if (this.particles.length > this.maxCount) {
+    return false;
+  }
+  var _x,_y;
+
+  if (x instanceof Vec2) {
+    _x = x.x;
+    _y = x.y;
+  }else {
+    _x = x;
+    _y = y;
+  }
+
+
+  var particles = this.particles;
+  var count = this.maxCount;
+
+  var width = getRandomInt(this.minWidth,this.maxWidth);
+  var dirX = getRandomInt(-50,0) / 100.0;
+  var dirY = getRandomInt(-100,0) / 100.0;
+  var directionNormalized = new Vec2(dirX,dirY);
+  directionNormalized.normalize();
+
+  //function Particle(x,y,width,height,vec2direction,life,color){
+
+  var p = new Particle(_x,_y,width,width,directionNormalized,this.life,0xff00aa00);
+  particles.push(p);
+  return true;
+}
 
 function init(){
   canvas = document.getElementById('webgl-canvas');
@@ -26,6 +58,11 @@ function init(){
     var bubbleTexture = new Texture(gl,bubbleImg);
     console.log(bubbleTexture);
     particleEngine = new ParticleEngine(gl,bubbleTexture,50);
+    tootParticles = new ParticleEngine(gl,bubbleTexture,25);
+    tootParticles.minWidth = 5;
+    tootParticles.maxWidth = 25;
+    tootParticles.life = 25;
+    tootParticles.generationMethod = generateToots;
     particleEngine.minWidth = 10;
     particleEngine.maxWidth = 50;
     particleEngine.life = 25;
@@ -105,8 +142,10 @@ function drawScene(){
   batch.drawSprite(ground);
   batch.drawSprite(ground2);
   batch.drawTexture(playerSheet,new Rect(col,row,0.25,0.25),new Rect(100,currentY,100,100),0,0xffffffff,1,50,50,true);
-  if (particleEngine)
+  if (particleEngine){
+    tootParticles.draw(batch);
     particleEngine.draw(batch);
+  }
   batch.end();
 
   // NOTE(Inspix): Inplace animation, just for testing, should be easily moved in its own object.
@@ -126,6 +165,7 @@ function drawScene(){
 
   //Handle jumping
   if(jumping===true){
+    tootParticles.Generate(125,currentY + 20);
 
     if(currentY<maxY){
       currentY+=7;
@@ -145,6 +185,7 @@ function drawScene(){
   }
 
   if (particleEngine){
+    tootParticles.Update(10);
     particleEngine.Generate(mousePosition.x, mousePosition.y);
     particleEngine.Update(5);
   }
