@@ -36,8 +36,8 @@ function SpriteBatch(gl) {
   };
 
 
-  this.drawSprite = function(sprite,flipX) {
-    this.draw(sprite,sprite.position.x, sprite.position.y, sprite.width, sprite.height, sprite.rotation, 0xffffffff, sprite.position.z,0,0,flipX);
+  this.drawSprite = function(sprite) {
+    this.draw(sprite,sprite.position.x, sprite.position.y, sprite.width, sprite.height, sprite.rotation, 0xffffffff, sprite.position.z,sprite.origin.x,sprite.origin.y,sprite.flipX);
   };
 
   this.draw = function(sprite, x, y, width, height, rotation, color, depth, originX, originY,flipX) {

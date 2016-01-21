@@ -1,10 +1,11 @@
 var gl;
 var canvas;
-var background,background2,ground,ground2,playerSheet;
+
 var batch;
 var particleEngine;
 var tootParticles;
-var mousePosition = new Vec2(0,0);
+var sceneManager;
+var gameplayScene;
 document.addEventListener("DOMContentLoaded",init);
 
 window.onerror = function(msg,url,line){
@@ -13,193 +14,48 @@ window.onerror = function(msg,url,line){
 };
 
 
-function generateToots(x,y){
-  if (this.particles.length > this.maxCount) {
-    return false;
-  }
-  var _x,_y;
 
-  if (x instanceof Vec2) {
-    _x = x.x;
-    _y = x.y;
-  }else {
-    _x = x;
-    _y = y;
-  }
-
-
-  var particles = this.particles;
-  var count = this.maxCount;
-
-  var width = getRandomInt(this.minWidth,this.maxWidth);
-  var dirX = getRandomInt(-100,-50) / 100.0;
-  var dirY = getRandomInt(-100,0) / 100.0;
-  var directionNormalized = new Vec2(dirX,dirY);
-  directionNormalized.normalize();
-  var colorR = getRandomInt(0,255);
-  var colorG = getRandomInt(0,255);
-  var colorB = getRandomInt(0,255);
-  var colorA = 155;
-
-  var color = (colorA << 24 ) | (colorB << 16) | (colorG << 8) | colorR;
-  console.log(color.toString(16));
-  //function Particle(x,y,width,height,vec2direction,life,color){
-
-  var p = new Particle(_x,_y,width,width,directionNormalized,this.life,color);
-  particles.push(p);
-  return true;
-}
 
 function init(){
   canvas = document.getElementById('webgl-canvas');
   gl = initWebGL(canvas);
   gl.defaultShader.setUniformMat4(new Mat4().createOrtho(0,canvas.width,canvas.height,0,-100,1000), gl.defaultShader.uLocations.uPrMatrix);
   batch = new SpriteBatch(gl);
+  gameplayScene = new GamePlayScene(gl,canvas);
+  gameplayScene.Init();
+  sceneManager = new SceneManager(gl);
 
-  var backgroundImg = new Image();
-  backgroundImg.src = "textures/bg.png";
-  var bubbleImg = new Image();
-  bubbleImg.src = "textures/bubble.png";
-  bubbleImg.onload = function(){
-    var bubbleTexture = new Texture(gl,bubbleImg);
-    console.log(bubbleTexture);
-    particleEngine = new ParticleEngine(gl,bubbleTexture,50);
-    tootParticles = new ParticleEngine(gl,bubbleTexture,50);
-    tootParticles.minWidth = 5;
-    tootParticles.maxWidth = 25;
-    tootParticles.life = 50;
-    tootParticles.generationMethod = generateToots;
-    particleEngine.minWidth = 10;
-    particleEngine.maxWidth = 50;
-    particleEngine.life = 25;
-  };
-  var groundImg = new Image();
-  groundImg.src='textures/grass.png';
-  var lavaImg = new Image();
-  lavaImg.src = 'textures/lava.png';
-  var playerImg = new Image();
-  playerImg.src = 'textures/playerSprite2.png';
-  // NOTE(Inspix): The sprites should be made after the image is loaded,
-  //               Thats why i use the onload callback to be sure.
-  backgroundImg.onload = function(){
-    var backgroundTexture = new Texture(gl,backgroundImg);
-    var groundTexture = new Texture(gl,groundImg);
-    var lavaTexture = new Texture(gl,lavaImg);
-    playerSheet = new Texture(gl,playerImg);
-    background = new Sprite(gl,new Vec3(0,0,0),new Vec2(canvas.width,canvas.height),backgroundTexture);
-    background2 = new Sprite(gl,new Vec3(canvas.width,0,0),new Vec2(canvas.width,canvas.height),backgroundTexture);
-    lava = new Sprite(gl,new Vec3(0,0,0),new Vec2(canvas.width,100),lavaTexture);
-    ground = new Sprite(gl,new Vec3(0,0,0),new Vec2(canvas.width,100),groundTexture);
-    ground2 = new Sprite(gl,new Vec3(canvas.width,0,0),new Vec2(canvas.width,100),groundTexture);
-    drawScene();
-  };
+  var Scene = new SplashScreenScene(gl);
+  Scene.Init();
 
-  canvas.addEventListener('mousemove', function(e) {
-    var rect = canvas.getBoundingClientRect();
-    mousePosition.x = e.clientX - rect.left;
-    mousePosition.y = rect.bottom - e.clientY;
+  window.addEventListener('keydown',function(e){
+    switch (e.key) {
+      case "j":
+      sceneManager.ChangeScene(gameplayScene);
+        break;
+      case "k":
+        sceneManager.ChangeScene(Scene);
+        break;
+      default:
+
+    }
   });
+
+  drawScene();
 
 }
 
-var row = 0.75;
-var col = 0.75;
-var accum = 0;
-var cooldown = 5;
-
-//jumping
-var minY = 80;
-var maxY = 660;
-var currentY = minY;
-var jumping = false;
-var falling = false;
 
 
-document.body.onmousedown = function() {
-  falling=false;
-  jumping=true;
-
-};
-document.body.onmouseup = function() {
-  falling=true;
-  jumping=false;
-};
-
-// NOTE(Inspix): Pseudo gameloop, just for testing, everything in this file is temporary.
 function drawScene(){
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-  background.position.x -= 2;
-  background2.position.x -= 2;
-
-  if (background2.position.x <= 0) {
-    background.position.x += canvas.width;
-    background2.position.x += canvas.width;
-  }
-
-  ground.position.x-=5;
-  ground2.position.x-=5;
-
-
-
   batch.begin();
-  batch.drawSprite(background);
-  batch.drawSprite(background2);
-  batch.drawSprite(ground);
-  batch.drawSprite(ground2);
-  batch.drawTexture(playerSheet,new Rect(col,row,0.25,0.25),new Rect(100,currentY,100,100),0,0xffffffff,1,50,50,true);
-  if (particleEngine){
-    tootParticles.draw(batch);
-    particleEngine.draw(batch);
-  }
+  sceneManager.Draw(batch);
   batch.end();
 
-  // NOTE(Inspix): Inplace animation, just for testing, should be easily moved in its own object.
-  // NOTE(Inspix): Rotation and image flip is not yet implemented.
-  if (--cooldown < 0) {
-    cooldown = 5;
-    col -= 0.25;
-    if (col < 0.0) {
-      col = 0.75;
+  sceneManager.Update(1);
 
-      row += 0.25;
-      if (row >= 1.0) {
-        row = 0;
-      }
-    }
-  }
-
-  //Handle jumping
-  if(jumping===true){
-    tootParticles.Generate(125,currentY + 20);
-
-    if(currentY<maxY){
-      currentY+=7;
-    }
-    else{
-      jumping=false;
-      falling=true;
-    }
-  }else if(falling){
-    if(currentY>minY){
-      currentY-=7;
-    }
-    else{
-      currentY = minY;
-      falling=false;
-    }
-  }
-
-  if (particleEngine){
-    tootParticles.Update(3);
-    particleEngine.Generate(mousePosition.x, mousePosition.y);
-    particleEngine.Update(5);
-  }
-
-  if (ground2.position.x<=0) {
-      ground.position.x += canvas.width;
-      ground2.position.x += canvas.width;
-  }
 
   requestAnimationFrame(drawScene);
 }
