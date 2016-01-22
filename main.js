@@ -4,6 +4,7 @@ var batch;
 var sceneManager;
 var gameplayScene;
 var font;
+var nextSceene = null;
 document.addEventListener("DOMContentLoaded",init);
 
 window.onerror = function(msg,url,line){
@@ -29,14 +30,25 @@ function init(){
   window.addEventListener('keydown',function(e){
     console.log(e);
     switch (e.keyCode) {
-      case 74:
-      sceneManager.ChangeScene(gameplayScene);
-        break;
-      case 75:
-        sceneManager.ChangeScene(Scene);
-        break;
-      default:
-
+        case 13:
+            switch (nextSceene) {
+                case 'New Game': sceneManager.ChangeScene(gameplayScene); break;
+                case 'About Us': break;
+                case 'Exit': break;
+            }
+            break;
+        case 40:
+            if (selectedOptionMenu<2) {
+                selectedOptionMenu++;
+                nextSceene = menuOptions[selectedOptionMenu];
+            }
+            break;
+        case 38:
+            if (selectedOptionMenu>0) {
+                selectedOptionMenu--;
+                nextSceene = menuOptions[selectedOptionMenu];
+            }
+            break;
     }
   });
 
@@ -51,7 +63,7 @@ function drawScene(){
 
   batch.begin();
   sceneManager.Draw(batch);
-  StringDraw();
+  /*StringDraw();*/
   batch.End();
 
   sceneManager.Update(1);
@@ -61,7 +73,7 @@ function drawScene(){
 }
 
 /* ---------------- Font Rendering Tests ---------------- */
-
+/*
 var stringOptions = {
   scaleX: 0.75,
   scaleY: 1.25,
@@ -76,9 +88,10 @@ var stringSize;
 function StringDraw(){
   if (font.initialized) {
     if (!stringSize) {
-      stringSize = font.MeasureString('Team Maxwell JavaScript TeamWork');
+      stringSize = font.MeasureString('TEst font');
       stringSize.x *= 0.75;
     }
-    batch.drawString(font,'Team Maxwell JavaScript TeamWork',canvas.width/2 - (stringSize.x || 1)/2,768, stringOptions);
+    batch.drawString(font,'TEst font',canvas.width/2 - (stringSize.x || 1)/2,768, stringOptions);
   }
 }
+*/
