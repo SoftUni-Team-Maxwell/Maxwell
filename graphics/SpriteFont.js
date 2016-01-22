@@ -51,6 +51,15 @@ SpriteFont.prototype.MeasureString = function(string) {
   return result;
 };
 
+SpriteFont.prototype.onLoad = function (){
+  throw 'Non implemented';
+};
+
+SpriteFont.prototype.Release = function(){
+  this.texture.Release();
+  this.charInfo = {};
+};
+
 function getCharInfoProperty(index) {
   switch (index) {
     case 0:

@@ -1,4 +1,4 @@
-function Sprite(gl, vec3Pos, vec2size, texture, texCoords, colors) {
+function Sprite(gl, vec3Pos, vec2size, texture) {
   // NOTE(Inspix): Useful and needed members
   this.glContext = gl;
   this.texture = texture;
@@ -6,7 +6,6 @@ function Sprite(gl, vec3Pos, vec2size, texture, texCoords, colors) {
   // NOTE(Inspix): Sprite transformation variables.
   this.width = vec2size.x || 1;
   this.height = vec2size.y || 1;
-  this.transform = new Mat4(1);
   this.position = vec3Pos || new Vec3(0, 0, 0);
   this.rotation = 0;
   this.scale = new Vec3(1, 1, 1);

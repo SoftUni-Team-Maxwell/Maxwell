@@ -1,9 +1,10 @@
-var gl;
-var canvas;
+var GL;
+var CANVAS;
 var batch;
 var sceneManager;
 var gameplayScene;
 var nextSceene = null;
+var ASSETMANAGER;
 document.addEventListener("DOMContentLoaded",init);
 
 window.onerror = function(msg,url,line){
@@ -11,19 +12,19 @@ window.onerror = function(msg,url,line){
   alert(url + '(' + line + '):' + msg);
 };
 
-
 function init(){
-  canvas = document.getElementById('webgl-canvas');
-  gl = initWebGL(canvas);
-  var matrix = new Mat4().createOrtho(0,canvas.width,canvas.height,0,-100,1000);
-  gl.defaultShader.setUniformMat4(matrix, gl.defaultShader.uLocations.uPrMatrix);
-  gl.defaultFontShader.setUniformMat4(matrix, gl.defaultFontShader.uLocations.uPrMatrix);
-  batch = new SpriteBatch(gl);
-  gameplayScene = new GamePlayScene(gl,canvas);
+  CANVAS = document.getElementById('webgl-canvas');
+  GL = initWebGL(CANVAS);
+  var matrix = new Mat4().createOrtho(0,CANVAS.width,CANVAS.height,0,-100,1000);
+  GL.defaultShader.setUniformMat4(matrix, GL.defaultShader.uLocations.uPrMatrix);
+  GL.defaultFontShader.setUniformMat4(matrix, GL.defaultFontShader.uLocations.uPrMatrix);
+  batch = new SpriteBatch(GL);
+  ASSETMANAGER = new AssetManager();
+  gameplayScene = new GamePlayScene(GL,CANVAS);
   gameplayScene.Init();
-  sceneManager = new SceneManager(gl);
+  sceneManager = new SceneManager(GL);
 
-  var Scene = new SplashScreenScene(gl);
+  var Scene = new SplashScreenScene(GL);
   Scene.Init();
 
   window.addEventListener('keydown',function(e){
@@ -51,14 +52,37 @@ function init(){
     }
   });
 
-  font = new SpriteFont(gl,'fonts/Calibri.fnt');
+/* ---------------------- AssetManager Tests ---------------------- */
+  ASSETMANAGER.QueueToLoadFont('default','fonts/Calibri.fnt');
+  ASSETMANAGER.QueueToLoadFont('cooperB','fonts/CooperBlack.fnt');
+  ASSETMANAGER.QueueToLoadFont('cooperBI','fonts/CooperBlackItalic.fnt');
+  ASSETMANAGER.QueueToLoadTexture('background','textures/bg.png');
+  ASSETMANAGER.QueueToLoadTexture('logo','textures/logo.png');
+  ASSETMANAGER.QueueToLoadSprite('background','background',
+  {
+      position : new Vec3(0, 0, 0),
+      size : new Vec2(CANVAS.width, CANVAS.height)
+    }
+  );
+  ASSETMANAGER.QueueToLoadSprite('logo','logo',
+  {
+      position : new Vec3(CANVAS.width / 3.2 - 10, CANVAS.height / 1.5, 0),
+      size : new Vec2(400, 170)
+    }
+  );
+  ASSETMANAGER.onProgressUpdate = function(percent, msg){
+    console.log(percent + '% - ' + msg);
+  };
+  ASSETMANAGER.Load();
+
+/* ---------------------- AssetManager Tests End ------------------- */
 
   drawScene();
 
 }
 
 function drawScene(){
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
 
   batch.begin();
   sceneManager.Draw(batch);
@@ -70,27 +94,3 @@ function drawScene(){
 
   requestAnimationFrame(drawScene);
 }
-
-/* ---------------- Font Rendering Tests ---------------- */
-/*
-var stringOptions = {
-  scaleX: 0.75,
-  scaleY: 1.25,
-  rotation: 0,
-  color: 0xff0000ff,
-  outlineColor: 0xffffff,
-  smoothing: 0.1,
-  depth:100
-};
-var stringSize;
-
-function StringDraw(){
-  if (font.initialized) {
-    if (!stringSize) {
-      stringSize = font.MeasureString('TEst font');
-      stringSize.x *= 0.75;
-    }
-    batch.drawString(font,'TEst font',canvas.width/2 - (stringSize.x || 1)/2,768, stringOptions);
-  }
-}
-*/

@@ -49,7 +49,7 @@ function ParticleEngine(glContext,texture,maxCount){
   ParticleEngine.prototype.Update = function(delta){
     for (var i = 0; i < this.particles.length; i++) {
 
-      this.particles[i].update(delta);
+      this.particles[i].Update(delta);
       if(this.particles[i].life <= 0){
         this.particles.splice(i,1);
         i--;

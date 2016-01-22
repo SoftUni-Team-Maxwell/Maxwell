@@ -1,3 +1,4 @@
+var quad;
 function SplashScreenScene(gl) {
   // NOTE(Inspix): Initialize baseclass members
   SceneNode.call(this, gl);
@@ -7,6 +8,7 @@ function SplashScreenScene(gl) {
   this.position = new Vec3(0, 0, 0);
   this.timeOnScreen = 100;
   this.font = null;
+  this.bubbleGenerator = null;
 }
 
 // NOTE(Inspix): Inherit from base object SceneNode
@@ -51,14 +53,14 @@ SplashScreenScene.prototype.Init = function() {
   var backgroundImg = new Image();
   backgroundImg.onload = function() {
     self.backgroundTexture = new Texture(gl, backgroundImg);
-    self.background = new Sprite(gl, new Vec3(0, 0, 0), new Vec2(canvas.width, canvas.height), self.backgroundTexture);
+    self.background = new Sprite(gl, new Vec3(0, 0, 0), new Vec2(CANVAS.width, CANVAS.height), self.backgroundTexture);
     self.initialized = true;
   };
   backgroundImg.src = 'textures/bg.png';
   var logoImg = new Image();
   logoImg.onload = function() {
     self.logoTexture = new Texture(gl, logoImg);
-    self.logo = new Sprite(gl, new Vec3(canvas.width / 3.2 - 10, canvas.height / 1.5, 0), new Vec2(400, 170), self.logoTexture);
+    self.logo = new Sprite(gl, new Vec3(CANVAS.width / 3.2 - 10, CANVAS.height / 1.5, 0), new Vec2(400, 170), self.logoTexture);
     self.initialized = true;
   };
   logoImg.src = 'textures/logo.png';
@@ -66,38 +68,12 @@ SplashScreenScene.prototype.Init = function() {
 };
 
 function logoRotation(logo) {
-  if (logo.position.x < canvas.width / 3.2 || logo.position.x > canvas.width / 3.2 + 10) {
+  if (logo.position.x < CANVAS.width / 3.2 || logo.position.x > CANVAS.width / 3.2 + 10) {
     logo.position.x -= 10;
     if (logo.position.x <= -400) {
-      logo.position.x = canvas.width;
+      logo.position.x = CANVAS.width;
     }
   }
-}
-
-function smoothTransition(rgba, rgba2, amount) {
-
-  if (rgba == rgba2) {
-    return rgba;
-  }
-
-  var c1R = (rgba & 0xff);
-  var c1G = ((rgba & 0xff00) >> 8);
-  var c1B = ((rgba & 0xff0000) >> 16);
-  var c1A = ((rgba & 0xff000000) >>> 24);
-
-  var c2R = (rgba2 & 0xff);
-  var c2G = ((rgba2 & 0xff00) >> 8);
-  var c2B = ((rgba2 & 0xff0000) >> 16);
-  var c2A = ((rgba2 & 0xff000000) >>> 24);
-
-
-  c1A = c1A > c2A ? c1A - amount < c2A ? c2A : c1A - amount : c1A + amount > c2A ? c2A : c1A + amount;
-  c1R = c1R > c2R ? c1R - amount < c2R ? c2R : c1R - amount : c1R + amount > c2R ? c2R : c1R + amount;
-  c1G = c1G > c2G ? c1G - amount < c2G ? c2G : c1G - amount : c1G + amount > c2G ? c2G : c1G + amount;
-  c1B = c1B > c2B ? c1B - amount < c2B ? c2B : c1B - amount : c1B + amount > c2B ? c2B : c1B + amount;
-
-  var result = c1A << 24 | c1B << 16 | c1G << 8 | c1R;
-  return result;
 }
 
 var stringOptions = {
@@ -134,10 +110,11 @@ function MenuDraw(font) {
     var lineSpacing = 400;
     for (var i = 0; i < menuOptions.length; i++) {
       if (i === selectedOptionMenu) {
-        batch.drawString(font, menuOptions[i], canvas.width / 2 - (stringSize.x || 1) + 10, lineSpacing, stringOptions);
+        batch.drawString(font, menuOptions[i], CANVAS.width / 2 - (stringSize.x || 1) + 10, lineSpacing, stringOptions);
       } else {
-        batch.drawString(font, menuOptions[i], canvas.width / 2 - (stringSize.x || 1) + 10, lineSpacing, selectedOption);
+        batch.drawString(font, menuOptions[i], CANVAS.width / 2 - (stringSize.x || 1) + 10, lineSpacing, selectedOption);
       }
+
       lineSpacing -= 75;
     }
   }

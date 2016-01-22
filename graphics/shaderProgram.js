@@ -15,77 +15,7 @@ function ShaderProgram(gl, vsSource, fsSource) {
   }
   this.vsSource = vsSource;
   this.fsSource = fsSource;
-  var inUse = false;
-
   // TODO(Inspix): Add more uniform setters
-  this.setUniformMat4 = function(mat4, loc) {
-    if (mat4 instanceof Mat4) {
-      if (!inUse) {
-        this.glContext.activeShader.unuseProgram();
-        this.useProgram();
-      }
-      this.glContext.uniformMatrix4fv(loc, false, mat4.values);
-    }
-  };
-
-  this.setUniformi = function(value, loc) {
-      if (!inUse) {
-        this.glContext.activeShader.unuseProgram();
-        this.useProgram();
-      }
-      this.glContext.uniform1i(loc, value);
-  };
-
-  this.setUniformf = function(value, loc) {
-      if (!inUse) {
-        this.glContext.activeShader.unuseProgram();
-        this.useProgram();
-      }
-      this.glContext.uniform1f(loc, value);
-  };
-
-  this.setUniform2f = function(value, loc) {
-      if (value instanceof Vec2) {
-        if (this.glContext.activeShader !== this) {
-          if (this.glContext.activeShader) {
-            this.glContext.activeShader.unuseProgram();
-          }
-          this.useProgram();
-        }
-        this.glContext.uniform2f(loc, value.x,value.y);
-      }
-
-  };
-
-  this.setUniform4f = function(value, loc) {
-      if (value.length === 4) {
-        if (this.glContext.activeShader !== this) {
-          if (this.glContext.activeShader) {
-            this.glContext.activeShader.unuseProgram();
-          }
-          this.useProgram();
-        }
-        this.glContext.uniform4f(loc, value[0],value[1],value[2],value[3]);
-      }
-
-  };
-
-  this.isInUse = function() {
-    return inUse;
-  };
-
-  this.useProgram = function() {
-    if (this.glContext.activeShader !== this) {
-      this.glContext.useProgram(this.id);
-      this.glContext.activeShader = this;
-    }
-  };
-  this.unuseProgram = function() {
-    if (this.glContext.activeShader === this) {
-      this.glContext.useProgram(null);
-      this.glContext.activeShader = null;
-    }
-  };
 
   var vertexShader = gl.createShader(gl.VERTEX_SHADER);
   gl.shaderSource(vertexShader, vsSource);
@@ -110,8 +40,10 @@ function ShaderProgram(gl, vsSource, fsSource) {
 
   if (!gl.getProgramParameter(this.id, gl.LINK_STATUS)) {
     throw gl.getProgramInfoLog(this.id);
+  }else {
+    gl.deleteShader(vertexShader);
+    gl.deleteShader(fragmentShader);
   }
-
   this.aLocations = {};
   this.uLocations = {};
   this.aLocations.aPosition = gl.getAttribLocation(this.id, 'aPosition');
@@ -136,6 +68,53 @@ function ShaderProgram(gl, vsSource, fsSource) {
   this.setUniformMat4(identity, this.uLocations.uPrMatrix);
   this.setUniformMat4(identity, this.uLocations.uVwMatrix);
   this.setUniformMat4(identity, this.uLocations.uModelMatrix);
-
-
 }
+
+ShaderProgram.prototype = {
+  constructor : ShaderProgram,
+  setUniformf : function(value, loc) {
+      this.useProgram();
+      this.glContext.uniform1f(loc, value);
+  },
+  setUniformi : function(value, loc) {
+      this.useProgram();
+      this.glContext.uniform1i(loc, value);
+  },
+  setUniform2f : function(value, loc) {
+      this.useProgram();
+      this.glContext.uniform2f(loc, value.x,value.y);
+  },
+  setUniform4f : function(value, loc) {
+      this.useProgram();
+      this.glContext.uniform4f(loc, value[0],value[1],value[2],value[3]);
+  },
+  setUniformMat4 : function(mat4, loc) {
+    if (mat4 instanceof Mat4) {
+      this.useProgram();
+      this.glContext.uniformMatrix4fv(loc, false, mat4.values);
+    }
+  },
+  useProgram : function() {
+    if (this.glContext.activeShader !== this) {
+      if (this.glContext.activeShader) {
+        this.glContext.activeShader.unuseProgram();
+      }
+      this.glContext.useProgram(this.id);
+      this.glContext.activeShader = this;
+    } else {
+      if (!this.isInUse) {
+        this.glContext.useProgram(this.id);
+        this.isInUse = true;
+        this.glContext.activeShader = this;
+
+      }
+    }
+  },
+  unuseProgram : function() {
+    if (this.glContext.activeShader === this) {
+      this.glContext.useProgram(null);
+      this.isInUse = false;
+      this.glContext.activeShader = null;
+    }
+  }
+};

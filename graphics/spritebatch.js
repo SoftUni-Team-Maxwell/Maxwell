@@ -97,7 +97,7 @@ function SpriteBatch(glContext) {
       (outlineColor & 0xff) / 255,
       ((outlineColor & 0xff00) >> 8) / 255,
       ((outlineColor & 0xff0000) >> 16) / 255,
-      options.outlineAlpha || options.outlineColor ? 1 : 0
+      ((outlineColor & 0xff000000) >>> 24) / 255
     ];
 
     var xAdvance = 0;
@@ -111,10 +111,10 @@ function SpriteBatch(glContext) {
       var heightSource = charInfo.height;
 
       var xPos = x + xAdvance;
-      var yPos = y - (charInfo.yoffset + charInfo.height) * texture.originalHeight * sY;
+      var yPos = y - (charInfo.yoffset + charInfo.height) * texture.height * sY;
 
 
-      this.drawTexture(texture,new Rect(xSource,ySource,widthSource,heightSource),new Rect(xPos,yPos,widthSource * texture.originalWidth * sX,heightSource * texture.originalHeight * sY),rotation,c,depth,originX - xAdvance,originX,false,true);
+      this.drawTexture(texture,new Rect(xSource,ySource,widthSource,heightSource),new Rect(xPos,yPos,widthSource * texture.width * sX,heightSource * texture.height * sY),rotation,c,depth,originX - xAdvance,originX,false,true);
       xAdvance += charInfo.xadvance * sX;
     }
   };
@@ -282,4 +282,10 @@ SpriteBatch.prototype.End = function(){
   this.gl.disableVertexAttribArray(shader.aLocations.aTexCoord);
   this.gl.disableVertexAttribArray(shader.aLocations.aRotation);
   this.gl.disableVertexAttribArray(shader.aLocations.aColor);
+};
+
+SpriteBatch.prototype.Release = function(){
+  this.gl.deleteBuffer(this.VertexDataBuffer);
+  this.gl.deleteBuffer(this.IndexBuffer);
+  this.bufferData.clear();
 };

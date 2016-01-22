@@ -1,5 +1,5 @@
-function GamePlayScene(gl, canvas) {
-  SceneNode.call(this, gl);
+function GamePlayScene(glContext, canvas) {
+  SceneNode.call(this, glContext);
   this.background = null;
   this.background2 = null;
   this.ground = null;
@@ -116,6 +116,7 @@ function GamePlayScene(gl, canvas) {
 GamePlayScene.prototype = Object.create(SceneNode.prototype);
 
 GamePlayScene.prototype.Init = function() {
+  var gl = this.gl;
   var canvas = this.canvas;
 
   var self = this;
