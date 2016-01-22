@@ -12,7 +12,7 @@ function SpriteFont(gl, filePath) {
     readFile(filePath, function(data) {
       var text = data.split('\n');
       var regex = /([0-9\.\-]+)/g;
-      for (var i = 5; i < text.length; i++) {
+      for (var i = 1; i < text.length; i++) {
         var info = {};
         var index = 0;
         // TODO(Inspix): Add kernings to the calculation.

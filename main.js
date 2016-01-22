@@ -3,7 +3,6 @@ var canvas;
 var batch;
 var sceneManager;
 var gameplayScene;
-var font;
 var nextSceene = null;
 document.addEventListener("DOMContentLoaded",init);
 

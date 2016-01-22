@@ -57,7 +57,7 @@ function SpriteBatch(glContext) {
         (outlineColor & 0xff) / 255,
         ((outlineColor & 0xff00) >> 8) / 255,
         ((outlineColor & 0xff0000) >> 16) / 255,
-        options.outlineAlpha || options.outlineColor ? 1 : 0
+        ((outlineColor & 0xff000000) >>> 24) / 255
       ];
 
       var charInfo = spritefont.charInfo[string.charCodeAt(i)];
