@@ -1,48 +1,9 @@
-var defaultVS = [
-  'attribute vec3 aPosition;',
-  'attribute vec4 aColor;',
-  'attribute vec2 aTexCoord;',
-  'attribute float aRotation;',
-  'attribute float tid;',
-  'varying vec4 vColor;',
-  'varying vec2 vTexCoord;',
-  'varying float vTid;',
-  'uniform mat4 uPrMatrix;',
-  'uniform mat4 uVwMatrix;',
-  'uniform mat4 uModelMatrix;',
-  'void main(){',
-  'vColor = aColor;',
-  'vTid = tid;',
-  'vTexCoord = aTexCoord;',
-  'float rot = aRotation;',
-  'gl_Position = uPrMatrix * uVwMatrix * uModelMatrix * vec4(aPosition,1.0);',
-  '}',
-].join('\n');
-
-var defaultFS = [
-  'precision mediump float;',
-  'varying vec4 vColor;',
-  'varying vec2 vTexCoord;',
-  'varying float vTid;',
-  'uniform bool useTexturing;',
-  'uniform sampler2D uSampler[16];',
-  'void main(){',
-  'vec4 c = vec4(1.0,1.0,1.0,1.0);',
-  'if(useTexturing){',
-  ' int id = int(vTid + 0.5);',
-  ' c = texture2D(uSampler[id],vTexCoord);',
-  '}',
-  'gl_FragColor = vColor * c;',
-  '}'
-].join('\n');
-
 // NOTE(Inspix): Currently is used mainly for the standard shader.
 // TODO(Inspix): Make it a bit more modular.
 function ShaderProgram(gl, vsSource, fsSource) {
   this.glContext = gl;
   var makeDefault = false;
   if (!vsSource) {
-
     vsSource =  document.getElementById('vshader').textContent;  //String(defaultVS);
     console.log('No Vertex Shader source supplied, creating default program');
     makeDefault = true;
@@ -60,6 +21,7 @@ function ShaderProgram(gl, vsSource, fsSource) {
   this.setUniformMat4 = function(mat4, loc) {
     if (mat4 instanceof Mat4) {
       if (!inUse) {
+        this.glContext.activeShader.unuseProgram();
         this.useProgram();
       }
       this.glContext.uniformMatrix4fv(loc, false, mat4.values);
@@ -68,17 +30,42 @@ function ShaderProgram(gl, vsSource, fsSource) {
 
   this.setUniformi = function(value, loc) {
       if (!inUse) {
+        this.glContext.activeShader.unuseProgram();
         this.useProgram();
       }
       this.glContext.uniform1i(loc, value);
   };
 
+  this.setUniformf = function(value, loc) {
+      if (!inUse) {
+        this.glContext.activeShader.unuseProgram();
+        this.useProgram();
+      }
+      this.glContext.uniform1f(loc, value);
+  };
+
   this.setUniform2f = function(value, loc) {
       if (value instanceof Vec2) {
-        if (!inUse) {
+        if (this.glContext.activeShader !== this) {
+          if (this.glContext.activeShader) {
+            this.glContext.activeShader.unuseProgram();
+          }
           this.useProgram();
         }
         this.glContext.uniform2f(loc, value.x,value.y);
+      }
+
+  };
+
+  this.setUniform4f = function(value, loc) {
+      if (value.length === 4) {
+        if (this.glContext.activeShader !== this) {
+          if (this.glContext.activeShader) {
+            this.glContext.activeShader.unuseProgram();
+          }
+          this.useProgram();
+        }
+        this.glContext.uniform4f(loc, value[0],value[1],value[2],value[3]);
       }
 
   };
@@ -88,15 +75,15 @@ function ShaderProgram(gl, vsSource, fsSource) {
   };
 
   this.useProgram = function() {
-    if (!inUse) {
-      inUse = true;
+    if (this.glContext.activeShader !== this) {
       this.glContext.useProgram(this.id);
+      this.glContext.activeShader = this;
     }
   };
   this.unuseProgram = function() {
-    if (inUse) {
-      inUse = false;
-      this.glContext.useProgram(0);
+    if (this.glContext.activeShader === this) {
+      this.glContext.useProgram(null);
+      this.glContext.activeShader = null;
     }
   };
 
@@ -111,7 +98,7 @@ function ShaderProgram(gl, vsSource, fsSource) {
   gl.shaderSource(fragmentShader, fsSource);
   gl.compileShader(fragmentShader);
 
-  if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
+  if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
     throw 'FragmentShader compilation error ' + gl.getShaderInfoLog(fragmentShader);
   }
 
@@ -127,26 +114,28 @@ function ShaderProgram(gl, vsSource, fsSource) {
 
   this.aLocations = {};
   this.uLocations = {};
-  if (makeDefault) {
-    this.aLocations.aPosition = gl.getAttribLocation(this.id, 'aPosition');
-    this.aLocations.aTexCoord = gl.getAttribLocation(this.id, 'aTexCoord');
-    this.aLocations.aColor = gl.getAttribLocation(this.id, 'aColor');
-    this.aLocations.aRotation = gl.getAttribLocation(this.id, 'aRotation');
-    this.aLocations.aTPosition = gl.getAttribLocation(this.id, 'aTPosition');
-    this.aLocations.aTOrigin = gl.getAttribLocation(this.id, 'aTOrigin');
-    this.aLocations.aTid = gl.getAttribLocation(this.id, 'aTid');
-    this.uLocations.uPrMatrix = gl.getUniformLocation(this.id, 'uPrMatrix');
-    this.uLocations.uVwMatrix = gl.getUniformLocation(this.id, 'uVwMatrix');
-    this.uLocations.uModelMatrix = gl.getUniformLocation(this.id, 'uModelMatrix');
-    this.uLocations.useTexturing = gl.getUniformLocation(this.id, 'useTexturing');
-    this.uLocations.uSampler = gl.getUniformLocation(this.id, 'uSampler');
-
-
-    var identity = new Mat4(1);
-    this.setUniformMat4(identity, this.uLocations.uPrMatrix);
-    this.setUniformMat4(identity, this.uLocations.uVwMatrix);
-    this.setUniformMat4(identity, this.uLocations.uModelMatrix);
-
+  this.aLocations.aPosition = gl.getAttribLocation(this.id, 'aPosition');
+  this.aLocations.aTexCoord = gl.getAttribLocation(this.id, 'aTexCoord');
+  this.aLocations.aColor = gl.getAttribLocation(this.id, 'aColor');
+  this.aLocations.aRotation = gl.getAttribLocation(this.id, 'aRotation');
+  this.aLocations.aTPosition = gl.getAttribLocation(this.id, 'aTPosition');
+  this.aLocations.aTOrigin = gl.getAttribLocation(this.id, 'aTOrigin');
+  this.aLocations.aTid = gl.getAttribLocation(this.id, 'aTid');
+  this.uLocations.uPrMatrix = gl.getUniformLocation(this.id, 'uPrMatrix');
+  this.uLocations.uVwMatrix = gl.getUniformLocation(this.id, 'uVwMatrix');
+  this.uLocations.uModelMatrix = gl.getUniformLocation(this.id, 'uModelMatrix');
+  this.uLocations.uSampler = gl.getUniformLocation(this.id, 'uSampler');
+  this.uLocations.useTexturing = gl.getUniformLocation(this.id, 'useTexturing');
+  if (!makeDefault) {
+    this.uLocations.uSmoothing = gl.getUniformLocation(this.id,'uSmoothing');
+    this.uLocations.uOutlineColor = gl.getUniformLocation(this.id, 'uOutlineColor');
   }
+
+  var identity = new Mat4(1);
+  this.glContext.activeShader = this;
+  this.setUniformMat4(identity, this.uLocations.uPrMatrix);
+  this.setUniformMat4(identity, this.uLocations.uVwMatrix);
+  this.setUniformMat4(identity, this.uLocations.uModelMatrix);
+
 
 }

@@ -97,6 +97,44 @@
     }
 
     </script>
+
+    <script id="fontFshader" type="x-shader">
+    precision mediump float;
+
+    varying float vTid;
+    varying vec4 vColor;
+    varying vec2 vTexCoord;
+
+    uniform bool useTexturing;
+    uniform float uSmoothing;
+    uniform vec4 uOutlineColor;
+    uniform sampler2D uSampler;
+
+
+    void main(){
+      vec4 result = vColor;
+      if (uOutlineColor.a < 0.05) {
+        float distance = texture2D(uSampler, vTexCoord).a;
+        float alpha = smoothstep(0.5 - uSmoothing, 0.5 + uSmoothing, distance);
+        result.a *= alpha;
+      }else {
+        vec4 outlineColor = uOutlineColor;
+        float distance = texture2D(uSampler, vTexCoord).a;
+        if(distance > 0.45 && distance < 0.50) {
+            float f = smoothstep(0.50, 0.45, distance);
+            result = mix(result, uOutlineColor, f);
+        } else if (distance <= 0.45 ) {
+            result = outlineColor;
+        }
+        result.a *= smoothstep(0.3 - uSmoothing, 0.3 + uSmoothing, distance);
+      }
+
+      gl_FragColor = result;
+    }
+
+    </script>
+
+
     <p>For now everthing is in a different file, later on we can combine them.</p>
     <canvas id="webgl-canvas" width="1024" height="768">
       Oops ... your browser is from the stone age... Please update...
@@ -110,6 +148,7 @@
     <script src="graphics/webglUtils.js" charset="utf-8"></script>
     <script src="graphics/particle.js" charset="utf-8"></script>
     <script src="graphics/particleEngine.js" charset="utf-8"></script>
+    <script src="graphics/SpriteFont.js" charset="utf-8"></script>
     <script src="Scene/SceneNode.js" charset="utf-8"></script>
     <script src="Scene/SplashScreenScene.js" charset="utf-8"></script>
     <script src="Scene/GamePlayScene.js" charset="utf-8"></script>

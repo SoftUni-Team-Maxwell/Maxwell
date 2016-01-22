@@ -1,6 +1,3 @@
-
-
-
 function SceneManager(glContext) {
   this.gl = glContext;
   this._scenes = {};
@@ -9,7 +6,7 @@ function SceneManager(glContext) {
   this._currentScene.Init();
   this._currentTransition = null;
   this._nextScene = null;
-  this._isTransitioning = false;  
+  this._isTransitioning = false;
 
 }
 SceneManager.prototype = {

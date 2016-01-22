@@ -1,5 +1,5 @@
 function initWebGL(canvas){
-  var gl = canvas.getContext('webgl');
+  var gl = canvas.getContext('webgl',{antialias: true});
 
   if (!gl) {
     throw 'Crap no WebGL context available';
@@ -12,12 +12,16 @@ function initWebGL(canvas){
 
   gl.enable(gl.DEPTH_TEST);
   gl.enable(gl.BLEND);
+  gl.blendEquation(gl.FUNC_ADD);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.depthFunc(gl.LEQUAL);
   // TODO(Inspix): Add alpfa blending.
 
   gl.defaultShader = new ShaderProgram(gl);
-  gl.defaultShader.useProgram();
+  var vertexSource = document.getElementById('vshader').textContent;
+  var fragmentSource = document.getElementById('fontFshader').textContent;
+  gl.defaultFontShader = new ShaderProgram(gl,vertexSource,fragmentSource);
+  gl.defaultFontShader.setUniformf(0.1,gl.defaultFontShader.uLocations.uSmoothing);
 
   return gl;
 }
