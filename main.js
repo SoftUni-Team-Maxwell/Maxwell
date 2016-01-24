@@ -19,13 +19,7 @@ function init(){
   GL.defaultShader.setUniformMat4(matrix, GL.defaultShader.uLocations.uPrMatrix);
   GL.defaultFontShader.setUniformMat4(matrix, GL.defaultFontShader.uLocations.uPrMatrix);
   batch = new SpriteBatch(GL);
-  ASSETMANAGER = new AssetManager();
-  gameplayScene = new GamePlayScene(GL,CANVAS);
-  gameplayScene.Init();
-  sceneManager = new SceneManager(GL);
 
-  var Scene = new SplashScreenScene(GL);
-  Scene.Init();
 
   window.addEventListener('keydown',function(e){
     console.log(e);
@@ -53,31 +47,31 @@ function init(){
   });
 
 /* ---------------------- AssetManager Tests ---------------------- */
+  ASSETMANAGER = new AssetManager();
   ASSETMANAGER.QueueToLoadFont('default','fonts/Calibri.fnt');
   ASSETMANAGER.QueueToLoadFont('cooperB','fonts/CooperBlack.fnt');
   ASSETMANAGER.QueueToLoadFont('cooperBI','fonts/CooperBlackItalic.fnt');
   ASSETMANAGER.QueueToLoadTexture('background','textures/bg.png');
   ASSETMANAGER.QueueToLoadTexture('logo','textures/logo.png');
-  ASSETMANAGER.QueueToLoadSprite('background','background',
-  {
-      position : new Vec3(0, 0, 0),
-      size : new Vec2(CANVAS.width, CANVAS.height)
-    }
-  );
-  ASSETMANAGER.QueueToLoadSprite('logo','logo',
-  {
-      position : new Vec3(CANVAS.width / 3.2 - 10, CANVAS.height / 1.5, 0),
-      size : new Vec2(400, 170)
-    }
-  );
+
   ASSETMANAGER.onProgressUpdate = function(percent, msg){
     console.log(percent + '% - ' + msg);
   };
+  ASSETMANAGER.onLoad = function(){
+    gameplayScene = new GamePlayScene(GL,CANVAS);
+    gameplayScene.Init();
+    var Scene = new SplashScreenScene(GL);
+    Scene.Init();
+    sceneManager = new SceneManager(GL);
+
+
+    drawScene();
+  };
+
   ASSETMANAGER.Load();
 
 /* ---------------------- AssetManager Tests End ------------------- */
 
-  drawScene();
 
 }
 
@@ -86,7 +80,6 @@ function drawScene(){
 
   batch.begin();
   sceneManager.Draw(batch);
-  /*StringDraw();*/
   batch.End();
 
   sceneManager.Update(1);

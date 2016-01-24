@@ -1,37 +1,9 @@
-function SpriteFont(gl, filePath) {
+function SpriteFont(glContext, filePath) {
+  this.gl = glContext;
   this.initialized = false;
   this.charInfo = {};
   this.texture = null;
-  var self = this;
-  var image = new Image();
-  var toInitialize = 2;
-  image.src = filePath.replace('fnt', 'png');
-  image.onload = function() {
-    self.texture = new Texture(gl, this);
-
-    readFile(filePath, function(data) {
-      var text = data.split('\n');
-      var regex = /([0-9\.\-]+)/g;
-      for (var i = 1; i < text.length; i++) {
-        var info = {};
-        var index = 0;
-        // TODO(Inspix): Add kernings to the calculation.
-        while ((matches = regex.exec(text[i])) !== null) {
-          var value = parseInt(matches[1]);
-          if (index === 2) {
-            value = image.naturalHeight - value;
-          }
-          if (!(index === 0 || index === 7)) {
-            value /= image.naturalWidth;
-          }
-
-          info[getCharInfoProperty(index++)] = value;
-        }
-        self.charInfo[info.char] = info;
-      }
-      self.initialized = true;
-    });
-  };
+  this.filePath = filePath;
 }
 
 SpriteFont.prototype.MeasureString = function(string) {
@@ -51,9 +23,42 @@ SpriteFont.prototype.MeasureString = function(string) {
   return result;
 };
 
-SpriteFont.prototype.onLoad = function (){
-  throw 'Non implemented';
+SpriteFont.prototype.Init = function(){
+  var self = this;
+  var image = new Image();
+  image.src = this.filePath.replace('fnt', 'png');
+  image.onload = function() {
+    self.texture = new Texture(self.gl, this);
+
+    readFile(self.filePath, function(data) {
+      var text = data.split('\n');
+      var regex = /([0-9\.\-]+)/g;
+      for (var i = 1; i < text.length; i++) {
+        var info = {};
+        var index = 0;
+        // TODO(Inspix): Add kernings to the calculation.
+        while ((matches = regex.exec(text[i])) !== null) {
+          var value = parseInt(matches[1]);
+          if (index === 2) {
+            value = image.naturalHeight - value;
+          }
+          if (!(index === 0 || index === 7)) {
+            value /= image.naturalWidth;
+          }
+
+          info[getCharInfoProperty(index++)] = value;
+        }
+        self.charInfo[info.char] = info;
+      }
+      if (self.onLoad) {
+        self.onLoad();
+      }
+      self.initialized = true;
+    });
+  };
 };
+
+SpriteFont.prototype.onLoad = null;
 
 SpriteFont.prototype.Release = function(){
   this.texture.Release();

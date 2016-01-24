@@ -1,4 +1,3 @@
-var quad;
 function SplashScreenScene(gl) {
   // NOTE(Inspix): Initialize baseclass members
   SceneNode.call(this, gl);
@@ -50,21 +49,10 @@ SplashScreenScene.prototype.Init = function() {
   var gl = this.gl;
   var self = this;
 
-  var backgroundImg = new Image();
-  backgroundImg.onload = function() {
-    self.backgroundTexture = new Texture(gl, backgroundImg);
-    self.background = new Sprite(gl, new Vec3(0, 0, 0), new Vec2(CANVAS.width, CANVAS.height), self.backgroundTexture);
-    self.initialized = true;
-  };
-  backgroundImg.src = 'textures/bg.png';
-  var logoImg = new Image();
-  logoImg.onload = function() {
-    self.logoTexture = new Texture(gl, logoImg);
-    self.logo = new Sprite(gl, new Vec3(CANVAS.width / 3.2 - 10, CANVAS.height / 1.5, 0), new Vec2(400, 170), self.logoTexture);
-    self.initialized = true;
-  };
-  logoImg.src = 'textures/logo.png';
-  this.font = new SpriteFont(gl, 'fonts/CooperBlackItalic.fnt');
+  self.background = new Sprite(gl, new Vec3(0, 0, 0), new Vec2(CANVAS.width, CANVAS.height), ASSETMANAGER.textures.background);
+  self.logo = new Sprite(gl, new Vec3(CANVAS.width / 3.2 - 10, CANVAS.height / 1.5, 0), new Vec2(400, 170), ASSETMANAGER.textures.logo);
+  this.font = ASSETMANAGER.fonts.cooperBI;
+  this.initialized = true;
 };
 
 function logoRotation(logo) {
