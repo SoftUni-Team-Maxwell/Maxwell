@@ -4,7 +4,39 @@ function SceneNode(glContext){
   this.children = [];
   this.initialized = false;
   this.sceneManager = null;
+  this.listeners = [];
 
+  this._release = function(){
+    var l = this.listeners;
+    for (var i = 0; i < l.length; i++) {
+      var c = l[i];
+      c.element.removeEventListener(c.event,c.func);
+    }
+    this.children = [];
+    this.gl = null;
+    this.sceneManager = null;
+    this.listeners = [];
+  };
+
+  this._addListener = function(element,e,func){
+    this.listeners.push({'element': element,'event': e,'func': func});
+    element.addEventListener(e,func);
+  };
+
+  this._removeListener = function(element,e,func){
+    var l = this.listeners;
+    for (var i = 0; i < l.length; i++) {
+      if (l[i].element === element) {
+        if (l[i].event === e) {
+          if (l[i].func === func) {
+            l.splice(i,1);
+            element.removeEventListener(e,func);
+            return true;
+          }
+        }
+      }
+    }  return false;
+  };
 }
 
 /**
@@ -87,4 +119,16 @@ SceneNode.prototype.RemoveNode = function(node){
       }
     }
   }
+};
+
+SceneNode.prototype.AddListener = function(element,e,func){
+  this._addListener(element,e,func);
+};
+
+SceneNode.prototype.RemoveListener = function(element,e,func){
+  return this._removeListener(element,e,func);
+};
+
+SceneNode.prototype.Release = function(){
+  this._release();
 };

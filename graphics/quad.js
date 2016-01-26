@@ -1,9 +1,9 @@
 var defaultColors = new Uint32Array(
   [
-     0xff000000,
-     0xff000000,
-     0xff000000,
-     0xff000000
+     0xffffffff,
+     0xffffffff,
+    //  0xffffffff,
+    //  0xffffffff
   ]
 );
 
@@ -21,19 +21,20 @@ function Quad(glContext, positionVec, width, heigth, colorArray){
     [
        x,y,z,
        x + width,y, z,
-       x + width, y + heigth, z,
-       x, y + heigth, z,
+      //  x + width, y + heigth, z,
+      //  x, y + heigth, z,
     ]
   );
 
   var indicies = new Uint16Array(
     [
-      0,1,2,
-      2,3,0
+      0,1,
+    //  2,
+  //    2,3,0
     ]
   );
 
-  var colors = colorArray || defaultColors;
+  var colors = defaultColors;
 
   this.vertexBuffer = this.gl.createBuffer();
   this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.vertexBuffer);
@@ -48,19 +49,22 @@ function Quad(glContext, positionVec, width, heigth, colorArray){
   this.gl.bufferData(this.gl.ARRAY_BUFFER, colors, this.gl.STATIC_DRAW);
 
   this.gl.bindBuffer(this.gl.ARRAY_BUFFER,null);
+  this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER,null);
 
   this.draw = function(){
     this.gl.defaultShader.useProgram();
+    var shader = this.gl.defaultShader;
+    shader.setUniformi(false,shader.uLocations.useTexturing);
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER,this.ibo);
-    this.gl.enableVertexAttribArray(this.shader.aLocations.aPosition);
+    this.gl.enableVertexAttribArray(shader.aLocations.aPosition);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.vertexBuffer);
-    this.gl.vertexAttribPointer(this.shader.aLocations.aPosition, 3, this.gl.FLOAT, false, 0, 0);
+    this.gl.vertexAttribPointer(shader.aLocations.aPosition, 3, this.gl.FLOAT, false, 0, 0);
 
-    this.gl.enableVertexAttribArray(this.shader.aLocations.aColor);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER,this.colorBuffer);
-    this.gl.vertexAttribPointer(this.shader.aLocations.aColor, 4, this.gl.UNSIGNED_BYTE, true, 0, 0);
-    this.gl.drawElements(this.gl.TRIANGLES, 6, this.gl.UNSIGNED_SHORT,0);
-
+    this.gl.enableVertexAttribArray(shader.aLocations.aColor);
+    this.gl.vertexAttribPointer(shader.aLocations.aColor, 4, this.gl.UNSIGNED_BYTE, true, 0, 0);
+    this.gl.lineWidth(5.0);
+    this.gl.drawElements(this.gl.LINES, 2, this.gl.UNSIGNED_SHORT,0);
     this.gl.bindBuffer(this.gl.ARRAY_BUFFER,null);
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER,null);
 

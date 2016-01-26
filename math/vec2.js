@@ -33,6 +33,7 @@ function Vec2(a,b){
     }
     this._x *= scalar;
     this._y *= scalar;
+    return this;
   };
 
   this.divide = function(other){
@@ -129,7 +130,7 @@ Vec2.prototype.length = function() {
 Vec2.prototype.normalize = function() {
   var length = this.length();
   if (length === 0.0) {
-    return;
+    return this;
   }
   this._x /= length;
   this._y /= length;

@@ -71,11 +71,13 @@ AssetManager.prototype = {
       //function Sprite(gl, vec3Pos, vec2size, texture, texCoords, colors) {
       var position = sprite.options.position || new Vec3(0,0,0);
       var size = sprite.options.size || new Vec2(100,100);
-      this.sprites[sprite.id] = new Sprite(GL,position,size,this.textures[sprite.textureId]);
+      this.sprites[sprite.id] = new Sprite(position,size,this.textures[sprite.textureId]);
       this.loaded++;
       this.onProgressUpdate(100*(this.loaded/this.total),'sprites/' + sprite.id);
       if (this.isLoaded()) {
-        this.onLoad() || console.log('unimplemented');
+        if (this.onLoad) {
+          this.onLoad();
+        }
       }
     }
     for (var f = 0; f < q.fonts.length; f++) {
@@ -131,7 +133,7 @@ AssetManager.prototype = {
           self.onLoad();
         }
       }
-    }
+    };
     current.Init();
   },
   onLoad : null,

@@ -1,6 +1,4 @@
-function Sprite(gl, vec3Pos, vec2size, texture) {
-  // NOTE(Inspix): Useful and needed members
-  this.glContext = gl;
+function Sprite(vec3Pos, vec2size, texture) {
   this.texture = texture;
 
   // NOTE(Inspix): Sprite transformation variables.

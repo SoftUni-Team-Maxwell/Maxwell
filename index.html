@@ -7,6 +7,9 @@
       body {
         text-align: center;
       }
+      canvas {
+        background: white;
+      }
     </style>
   </head>
   <body>
@@ -67,15 +70,21 @@
       }
 
       void main(){
-        vec3 rotated = RotateVector(vec3(aPosition.xy - aTOrigin,aPosition.z), aRotation);
-        rotated.xy += aTOrigin;
-        rotated += vec3(aTPosition,0);
+        vec3 result = vec3(0.0);
+        if (aRotation != 0.0) {
+          result = RotateVector(vec3(aPosition.xy - aTOrigin,aPosition.z), aRotation);
+          result.xy += aTOrigin;
+          result += vec3(aTPosition,0);
+        }else {
+          result = aPosition + vec3(aTPosition,0);
+        }
+
 
         vColor = aColor;
         vTid = aTid;
         vTexCoord = aTexCoord;
 
-        gl_Position = uPrMatrix * uVwMatrix * uModelMatrix * vec4(rotated,1.0);
+        gl_Position = uPrMatrix * uVwMatrix * uModelMatrix * vec4(result,1.0);
       }
     </script>
     <script id="fshader" type="x-shader">
@@ -135,10 +144,13 @@
     </script>
 
 
-    <p>For now everthing is in a different file, later on we can combine them.</p>
-    <canvas id="webgl-canvas" width="1024" height="768">
-      Oops ... your browser is from the stone age... Please update...
-    </canvas>
+    <div id="wrapper">
+      <p>For now everthing is in a different file, later on we can combine them.</p>
+      <canvas id="webgl-canvas" width="1152" height="648">
+        Oops ... your browser is from the stone age... Please update...
+      </canvas><br>
+      <a href="#" onclick="fullscreen();">Fullscreen</a>
+    </div>
     <script src="graphics/texture.js" charset="utf-8"></script>
     <script src="graphics/sprite.js" charset="utf-8"></script>
     <script src="graphics/shaderProgram.js" charset="utf-8"></script>
@@ -154,6 +166,7 @@
     <script src="Scene/SplashScreenScene.js" charset="utf-8"></script>
     <script src="Scene/GamePlayScene.js" charset="utf-8"></script>
     <script src="Scene/SceneManager.js" charset="utf-8"></script>
+    <script src="Scene/Transition.js" charset="utf-8"></script>
     <script src="math/vec2.js" charset="utf-8"></script>
     <script src="math/vec3.js" charset="utf-8"></script>
     <script src="math/rect.js" charset="utf-8"></script>

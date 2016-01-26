@@ -30,21 +30,25 @@ function GamePlayScene(glContext, canvas) {
     flipX: true
   };
 
-  canvas.addEventListener('mousemove', function(e) {
+  this.AddListener(CANVAS,'mousemove', MousePosition);
+  this.AddListener(CANVAS,'mousedown',MouseDown);
+  this.AddListener(CANVAS,'mouseup',MouseUp);
+
+  function MousePosition(e) {
     var rect = canvas.getBoundingClientRect();
     mousePosition.x = e.clientX - rect.left;
     mousePosition.y = rect.bottom - e.clientY;
-  });
+  }
 
-  document.body.onmousedown = function() {
+  function MouseDown() {
     falling = false;
     jumping = true;
+  }
 
-  };
-  document.body.onmouseup = function() {
+  function MouseUp() {
     falling = true;
     jumping = false;
-  };
+  }
 
   this._updateSelf = function(delta) {
     if (--cooldown < 0) {
@@ -119,70 +123,23 @@ GamePlayScene.prototype.Init = function() {
   var gl = this.gl;
   var canvas = this.canvas;
 
-  var self = this;
-  var countToLoad = 7;
+  this.particleEngine = new ParticleEngine(gl, ASSETMANAGER.textures.bubble, 50);
+  this.tootParticles = new ParticleEngine(gl, ASSETMANAGER.textures.bubble, 50);
+  this.tootParticles.minWidth = 5;
+  this.tootParticles.maxWidth = 25;
+  this.tootParticles.life = 50;
+  this.tootParticles.generationMethod = generateToots;
+  this.particleEngine.minWidth = 10;
+  this.particleEngine.maxWidth = 50;
+  this.particleEngine.life = 25;
 
-  var backgroundImg = new Image();
-  backgroundImg.src = "textures/bg.png";
-  backgroundImg.onload = function() {
-    var backgroundTexture = new Texture(gl, backgroundImg);
-    self.background = new Sprite(gl, new Vec3(0, 0, 0), new Vec2(canvas.width, canvas.height), backgroundTexture);
-    self.background2 = new Sprite(gl, new Vec3(canvas.width, 0, 0), new Vec2(canvas.width, canvas.height), backgroundTexture);
-    countToLoad -= 2;
-    if (countToLoad <= 0) {
-      this.initialized = true;
-    }
-  };
-
-  var bubbleImg = new Image();
-  bubbleImg.src = "textures/bubble.png";
-  bubbleImg.onload = function() {
-    var bubbleTexture = new Texture(gl, bubbleImg);
-    self.particleEngine = new ParticleEngine(gl, bubbleTexture, 50);
-    self.tootParticles = new ParticleEngine(gl, bubbleTexture, 50);
-    self.tootParticles.minWidth = 5;
-    self.tootParticles.maxWidth = 25;
-    self.tootParticles.life = 50;
-    self.tootParticles.generationMethod = generateToots;
-    self.particleEngine.minWidth = 10;
-    self.particleEngine.maxWidth = 50;
-    self.particleEngine.life = 25;
-    countToLoad -= 2;
-    if (countToLoad >= 0) {
-      this.initialized = true;
-    }
-  };
-
-  var groundImg = new Image();
-  groundImg.src = 'textures/grass.png';
-  groundImg.onload = function() {
-    var groundTexture = new Texture(gl, groundImg);
-    self.ground = new Sprite(gl, new Vec3(0, 0, 0), new Vec2(canvas.width, 100), groundTexture);
-    self.ground2 = new Sprite(gl, new Vec3(canvas.width, 0, 0), new Vec2(canvas.width, 100), groundTexture);
-    countToLoad -= 2;
-    if (countToLoad <= 0) {
-      this.initialized = true;
-    }
-  };
-
-  var lavaImg = new Image();
-  lavaImg.src = 'textures/lava.png';
-  lavaImg.onload = function() {
-    var lavaTexture = new Texture(gl, lavaImg);
-    self.lava = new Sprite(gl, new Vec3(0, 0, 0), new Vec2(canvas.width, 100), lavaTexture);
-    if (--countToLoad >= 0) {
-      this.initialized = true;
-    }
-  };
-
-  var playerImg = new Image();
-  playerImg.src = 'textures/playerSprite2.png';
-  playerImg.onload = function() {
-    self.playerSheet = new Texture(gl, playerImg);
-    if (--countToLoad >= 0) {
-      this.initialized = true;
-    }
-  };
+  this.background = new Sprite(new Vec3(0, 0, 0), new Vec2(canvas.width, canvas.height), ASSETMANAGER.textures.background);
+  this.background2 = new Sprite(new Vec3(canvas.width, 0, 0), new Vec2(canvas.width, canvas.height), ASSETMANAGER.textures.background);
+  this.ground = new Sprite(new Vec3(0, 0, 0), new Vec2(canvas.width, 100), ASSETMANAGER.textures.grass);
+  this.ground2 = new Sprite(new Vec3(canvas.width, 0, 0), new Vec2(canvas.width, 100), ASSETMANAGER.textures.grass);
+  this.lava = new Sprite(new Vec3(0, 0, 0), new Vec2(canvas.width, 100), ASSETMANAGER.textures.lava);
+  this.playerSheet = ASSETMANAGER.textures.player;
+  this.initialized = true;
 };
 
 
@@ -220,7 +177,7 @@ function generateToots(x, y) {
   var colorR = getRandomInt(0, 255);
   var colorG = getRandomInt(0, 255);
   var colorB = getRandomInt(0, 255);
-  var colorA = 155;
+  var colorA = 175;
 
   var color = (colorA << 24) | (colorB << 16) | (colorG << 8) | colorR;
 

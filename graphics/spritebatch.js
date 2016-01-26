@@ -38,21 +38,22 @@ function SpriteBatch(glContext) {
 
   this.drawChar = function(spritefont,char,x,y,options){
     if (!(spritefont instanceof SpriteFont)) return;
+      var opt = options || {};
 
       if (this.gl.activeShader !== this.gl.defaultFontShader) {
           this.gl.defaultFontShader.useProgram();
-          if (options.smoothing) {
-            this.gl.defaultFontShader.setUniformf(options.smoothing,this.gl.defaultFontShader.uLocations.uSmoothing);
+          if (opt.smoothing) {
+            this.gl.defaultFontShader.setUniformf(opt.smoothing,this.gl.defaultFontShader.uLocations.uSmoothing);
           }
       }
-      var sX = options.scaleX || 1;
-      var sY = options.scaleY || 1;
-      var c = options.color || 0xffffffff;
-      var originX = options.originX || 0;
-      var originY = options.originY || 0;
-      var rotation = options.rotation || 0;
-      var depth = options.depth || 0;
-      var outlineColor = options.outlineColor || 0x00000000;
+      var sX = opt.scaleX || 1;
+      var sY = opt.scaleY || 1;
+      var c = opt.color || 0xffffffff;
+      var originX = opt.originX || 0;
+      var originY = opt.originY || 0;
+      var rotation = opt.rotation || 0;
+      var depth = opt.depth || 0;
+      var outlineColor = opt.outlineColor || 0x00000000;
       var outlineColorFloats = [
         (outlineColor & 0xff) / 255,
         ((outlineColor & 0xff00) >> 8) / 255,
@@ -77,21 +78,22 @@ function SpriteBatch(glContext) {
   };
 
   this.drawString = function(spritefont,string,x,y,options){
+    var opt = options || {};
     if (this.gl.activeShader !== this.gl.defaultFontShader) {
         this.gl.defaultFontShader.useProgram();
-        if (options.smoothing) {
-          this.gl.defaultFontShader.setUniformf(options.smoothing,this.gl.defaultFontShader.uLocations.uSmoothing);
+        if (opt.smoothing) {
+          this.gl.defaultFontShader.setUniformf(opt.smoothing,this.gl.defaultFontShader.uLocations.uSmoothing);
         }
     }
-    var sX = options.scaleX || 1;
-    var sY = options.scaleY || 1;
-    var c = options.color || 0xffffffff;
-    var originX = options.originX || 0;
-    var originY = options.originY || 0;
-    var rotation = options.rotation || 0;
+    var sX = opt.scaleX || 1;
+    var sY = opt.scaleY || 1;
+    var c = opt.color || 0xffffffff;
+    var originX = opt.originX || 0;
+    var originY = opt.originY || 0;
+    var rotation = opt.rotation || 0;
     var texture = spritefont.texture;
-    var depth = options.depth || 0;
-    var outlineColor = options.outlineColor || 0x00000000;
+    var depth = opt.depth || 0;
+    var outlineColor = opt.outlineColor || 0x00000000;
 
     var outlineColorFloats = [
       (outlineColor & 0xff) / 255,
@@ -119,6 +121,94 @@ function SpriteBatch(glContext) {
     }
   };
 
+  this.drawLine = function(x,y,x2,y2,options){
+    var opt = options || {};
+    var depth = opt.depth || 0;
+    var rotation = opt.rotation || 0;
+    var color = opt.color || 0xffffffff;
+    var originX = opt.originX || 0;
+    var originY = opt.originY || 0;
+    var thickness = opt.thickness || 1;
+
+    var normal = new Vec2(y2 - y, -(x2 - x)).normalize().multiplyScalar(thickness);
+    var index = 0;
+
+    this._vertexData[index++] = x + normal.x;
+    this._vertexData[index++] = y + normal.y;
+    this._vertexData[index++] = depth;
+    this._vertexData[index++] = 0;
+    this._vertexData[index++] = 0;
+    this._vertexData[index++] = rotation;
+    this._vertexColors[index++] = color;
+    this._vertexData[index++] = 0;
+    this._vertexData[index++] = 0;
+    this._vertexData[index++] = originX;
+    this._vertexData[index++] = originY;
+
+    this._vertexData[index++] = x2 + normal.x;
+    this._vertexData[index++] = y2 + normal.y;
+    this._vertexData[index++] = depth;
+    this._vertexData[index++] = 1;
+    this._vertexData[index++] = 0;
+    this._vertexData[index++] = rotation;
+    this._vertexColors[index++] = color;
+    this._vertexData[index++] = 0;
+    this._vertexData[index++] = 0;
+    this._vertexData[index++] = originX;
+    this._vertexData[index++] = originY;
+
+    this._vertexData[index++] = x2 - normal.x;
+    this._vertexData[index++] = y2 - normal.y;
+    this._vertexData[index++] = depth;
+    this._vertexData[index++] = 1;
+    this._vertexData[index++] = 1;
+    this._vertexData[index++] = rotation;
+    this._vertexColors[index++] = color;
+    this._vertexData[index++] = 0;
+    this._vertexData[index++] = 0;
+    this._vertexData[index++] = originX;
+    this._vertexData[index++] = originY;
+
+    this._vertexData[index++] = x - normal.x;
+    this._vertexData[index++] = y - normal.y;
+    this._vertexData[index++] = depth;
+    this._vertexData[index++] = 1;
+    this._vertexData[index++] = 0;
+    this._vertexData[index++] = rotation;
+    this._vertexColors[index++] = color;
+    this._vertexData[index++] = 0;
+    this._vertexData[index++] = 0;
+    this._vertexData[index++] = originX;
+    this._vertexData[index++] = originY;
+
+    this._render();
+  };
+
+  // this.drawLine = function(x,y,x2,y2,options){
+
+  this.drawRect = function(rect,options){
+      if (rect instanceof Rect) {
+        var x1 = rect.x;
+        var y1 = rect.y;
+        var x2 = rect.x + rect.width;
+        var y2 = rect.y + rect.height;
+        var thickness = (options ? options.thickness | 1 : 1);
+        this.drawLine(x1-thickness,y1,x2+ thickness,y1,options);
+        this.drawLine(x2,y1-thickness,x2,y2+thickness,options);
+        this.drawLine(x2+thickness,y2,x1-thickness,y2,options);
+        this.drawLine(x1,y2+thickness,x1,y1-thickness,options);
+      }else {
+        throw 'rect must be instantiated to draw a rectangle';
+      }
+
+  };
+
+  this.drawQuad = function(rect,options){
+    var opt = options || {};
+    opt.destinationRectangle = rect;
+    this.DrawTexture(null,opt);
+  };
+
   this.drawSprite = function(sprite) {
     this.draw(sprite,sprite.position.x, sprite.position.y, sprite.width, sprite.height, sprite.rotation, 0xffffffff, sprite.position.z,sprite.origin.x,sprite.origin.y,sprite.flipX);
   };
@@ -144,18 +234,22 @@ function SpriteBatch(glContext) {
 
   this._render = function(texture) {
     var shader = this.gl.activeShader;
-
-    shader.setUniformi(texture ? true : false, shader.uLocations.useTexturing);
-    shader.setUniformi(0, shader.uLocations.uSampler);
+    if (texture) {
+      shader.setUniformi(true, shader.uLocations.useTexturing);
+      this.gl.activeTexture(this.gl.TEXTURE0);
+      this.gl.bindTexture(this.gl.TEXTURE_2D, texture.id);
+    }else {
+      this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+      shader.setUniformi(false, shader.uLocations.uSampler);
+      shader.setUniformi(false, shader.uLocations.useTexturing);
+    }
 
     this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, this._bufferData);
-    this.gl.activeTexture(this.gl.TEXTURE0);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, texture.id);
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.IndexBuffer);
     this.gl.drawElements(this.gl.TRIANGLES, 6, this.gl.UNSIGNED_SHORT, 0);
+
+
   };
-
-
 }
 
 /**

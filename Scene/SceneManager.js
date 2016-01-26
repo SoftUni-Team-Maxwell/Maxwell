@@ -1,12 +1,21 @@
 function SceneManager(glContext) {
   this.gl = glContext;
-  this._scenes = {};
+  this.scenes = {};
   this._transitions = {};
-  this._currentScene = new SplashScreenScene(this.gl);
-  this._currentScene.Init();
+  this._currentScene = null;
   this._currentTransition = null;
   this._nextScene = null;
   this._isTransitioning = false;
+
+  this._changeScene = function(scene){
+    if (this._currentTransition) {
+      this._nextScene = scene;
+      this._isTransitioning = true;
+    }
+    else{
+      this._currentScene = scene;
+    }
+  };
 
 }
 SceneManager.prototype = {
@@ -19,6 +28,18 @@ SceneManager.prototype = {
   set currentTransition(value) {
     if (value instanceof Transition)
       this._currentTransition = value;
+  }
+};
+
+SceneManager.prototype.AddScene = function(id,scene){
+  if (scene instanceof SceneNode) {
+    this.scenes[id] = scene;
+  }
+};
+
+SceneManager.prototype.RemoveScene = function(id){
+  if (this.scenes[id]) {
+    this.scenes[id] = null;
   }
 };
 
@@ -37,12 +58,8 @@ SceneManager.prototype.Draw = function(batch){
 
 SceneManager.prototype.ChangeScene = function(scene){
   if (scene instanceof SceneNode) {
-    if (this._currentTransition) {
-      this._nextScene = scene;
-      this._isTransitioning = true;
-    }
-    else{
-      this._currentScene = scene;
-    }
+    this._changeScene(scene);
+  }else if (this.scenes[scene]) {
+    this._changeScene(this.scenes[scene]);
   }
 };

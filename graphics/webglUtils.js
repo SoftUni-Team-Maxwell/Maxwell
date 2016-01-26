@@ -12,8 +12,8 @@ function initWebGL(canvas){
 
   gl.enable(gl.DEPTH_TEST);
   gl.enable(gl.BLEND);
-  gl.blendEquation(gl.FUNC_ADD);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.blendEquation(gl.FUNC_ADD);
   gl.depthFunc(gl.LEQUAL);
   // TODO(Inspix): Add alpfa blending.
 
