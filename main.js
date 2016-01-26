@@ -24,10 +24,12 @@ function init() {
 
   /* ---------------------- Load assets ---------------------- */
   ASSETMANAGER = new AssetManager();
+  ASSETMANAGER.QueueToLoadFont('default', 'fonts/Calibri.fnt');
   ASSETMANAGER.QueueToLoadFont('cooperB', 'fonts/CooperBlack.fnt');
   ASSETMANAGER.QueueToLoadFont('cooperBI', 'fonts/CooperBlackItalic.fnt');
   ASSETMANAGER.QueueToLoadTexture('background', 'textures/bg.png');
   ASSETMANAGER.QueueToLoadTexture('logo', 'textures/logo.png');
+  ASSETMANAGER.QueueToLoadTexture('pauseButton', 'textures/pauseButton.png');
   ASSETMANAGER.QueueToLoadTexture('bubble', 'textures/bubble.png');
   ASSETMANAGER.QueueToLoadTexture('grass', 'textures/grass.png');
   ASSETMANAGER.QueueToLoadTexture('lava', 'textures/lava.png');

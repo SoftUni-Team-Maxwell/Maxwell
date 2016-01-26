@@ -9,7 +9,8 @@ function GamePlayScene(glContext, canvas) {
   this.particleEngine = null;
   this.tootParticles = null;
   this.canvas = canvas;
-
+  this.hud = null;
+  this.pause = false;
 
   /*------------------- Private Logic -------------*/
 
@@ -51,6 +52,8 @@ function GamePlayScene(glContext, canvas) {
   }
 
   this._updateSelf = function(delta) {
+    // Test score
+    this.hud.score++;
     if (--cooldown < 0) {
       cooldown = 5;
       playerOptions.sourceRectangle.x -= 0.25;
@@ -96,6 +99,7 @@ function GamePlayScene(glContext, canvas) {
 
     this.tootParticles.Update(3);
     this.particleEngine.Generate(mousePosition.x, mousePosition.y);
+    this.hud.mousePosition = mousePosition;
     this.particleEngine.Update(5);
 
 
@@ -120,6 +124,9 @@ function GamePlayScene(glContext, canvas) {
 GamePlayScene.prototype = Object.create(SceneNode.prototype);
 
 GamePlayScene.prototype.Init = function() {
+  if (this.initialized) {
+    return;
+  }
   var gl = this.gl;
   var canvas = this.canvas;
 
@@ -139,11 +146,17 @@ GamePlayScene.prototype.Init = function() {
   this.ground2 = new Sprite(new Vec3(canvas.width, 0, 0), new Vec2(canvas.width, 100), ASSETMANAGER.textures.grass);
   this.lava = new Sprite(new Vec3(0, 0, 0), new Vec2(canvas.width, 100), ASSETMANAGER.textures.lava);
   this.playerSheet = ASSETMANAGER.textures.player;
+  this.hud = new HudScene(gl);
+  this.hud.Init();
+  this.AddNode(this.hud);
   this.initialized = true;
 };
 
 
 GamePlayScene.prototype.UpdateSelf = function(delta) {
+  if (this.pause) {
+    return;
+  }
   this._updateSelf(delta);
 };
 

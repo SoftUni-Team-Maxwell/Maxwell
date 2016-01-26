@@ -5,6 +5,7 @@ function SceneNode(glContext){
   this.initialized = false;
   this.sceneManager = null;
   this.listeners = [];
+  this.parent = null;
 
   this._release = function(){
     var l = this.listeners;
@@ -60,10 +61,8 @@ SceneNode.prototype.onFinish = function(){
 SceneNode.prototype.Update = function(delta){
   var d = delta || 1;
   this.UpdateSelf(delta);
-  for (var node in this.children) {
-    if (node.hasOwnProperty('Update')) {
-      node.Update(d);
-    }
+  for (var i = 0; i < this.children.length; i++) {
+    this.children[i].Update(batch);
   }
 };
 
@@ -81,10 +80,8 @@ SceneNode.prototype.UpdateSelf = function(delta){
 SceneNode.prototype.Draw = function(batch){
   if (batch instanceof SpriteBatch) {
     this.DrawSelf(batch);
-    for (var node in this.children) {
-      if (node.hasOwnProperty('Draw')) {
-        node.Draw(batch);
-      }
+    for (var i = 0; i < this.children.length; i++) {
+      this.children[i].Draw(batch);
     }
   }
 };
@@ -103,6 +100,7 @@ SceneNode.prototype.DrawSelf = function(batch){
 SceneNode.prototype.AddNode = function(node){
   if (node instanceof SceneNode) {
     this.children.push(node);
+    node.parent = this;
   }
 };
 
@@ -115,6 +113,7 @@ SceneNode.prototype.RemoveNode = function(node){
     for (var i = 0; i < this.children.length; i++) {
       if (node === this.children[i]) {
         this.children.splice(i,1);
+        node.parent = null;
         return;
       }
     }

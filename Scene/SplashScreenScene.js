@@ -34,7 +34,6 @@ function SplashScreenScene(gl) {
   this.transitionMenu = new Transition(0,1000);
   this.transitionMenu.onUpdate = function(delta,percent){
     var amount = ((percent / 100) * 255) | 0;
-    console.log(amount);
     var ccolor = self.selectedOption.color;
     self.selectedOption.color = amount << 24 | (ccolor & 0xff0000) << 16 | (ccolor & 0xff00) << 8 | (ccolor & 0xff);
     ccolor = self.stringOptions.color;
@@ -51,8 +50,6 @@ function SplashScreenScene(gl) {
 
 
   function KeyInput(e) {
-    console.log("KeyInput");
-    console.log(this);
     switch (e.keyCode) {
       case 13:
         switch (self.selectedMenu) {
@@ -66,16 +63,13 @@ function SplashScreenScene(gl) {
         }
         break;
       case 40:
-        console.log(self.selectedMenu);
         if (self.selectedMenu < 2) {
           self.selectedMenu++;
-          console.log(self.selectedMenu);
         }
         break;
       case 38:
         if (self.selectedMenu > 0) {
           self.selectedMenu--;
-          console.log(self.selectedMenu);
         }
         break;
     }

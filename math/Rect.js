@@ -36,5 +36,19 @@ Rect.prototype = {
   set height(value) {
     if (isNaN(value)) return;
     this._height = value;
+  },
+  ContainsPoint : function(xPos,yPos){
+    var x,y;
+    if (xPos instanceof Vec2) {
+      x = xPos.x;
+      y = xPos.y;
+    }else {
+      x = xPos;
+      y = yPos;
+    }
+    var xIn = this._x <= x && this._x + this._width >= x;
+    var yIn = this._y <= y && this._y + this._height >= y;
+
+    return xIn && yIn;
   }
 };

@@ -61,7 +61,7 @@ function ParticleEngine(glContext,texture,maxCount){
     var p = this.particles;
     for (var i = 0; i < p.length; i++) {
       //texture, sourceRect, destinationRect, rotation, color, depth, originX, originY,flipX
-      batch.drawTexture(this.texture,null,new Rect(p[i].position.x,p[i].position.y,p[i].width,p[i].height),0,p[i].color,15);
+      batch.drawTexture(this.texture,null,new Rect(p[i].position.x,p[i].position.y,p[i].width,p[i].height),1,p[i].color,15);
     }
   };
 
