@@ -14,11 +14,11 @@ function SplashScreenScene(gl) {
     scaleX: 0.75,
     scaleY: 1.0,
     rotation: 0,
-    color: 0x000000ff,
+    color: 0x00ff3377,
     outlineColor: 0x00110000,
     smoothing: 0.1,
     depth: 100,
-    destinationC: 0xffff5555,
+    destinationC: 0xff0000aa,
     originalC: 0xff000000
   };
 
@@ -26,7 +26,7 @@ function SplashScreenScene(gl) {
     scaleX: 0.75,
     scaleY: 1,
     rotation: 0,
-    color: 0x00110000,
+    color: 0x00333333,
     smoothing: 0.1,
     depth: 100
   };
@@ -34,12 +34,9 @@ function SplashScreenScene(gl) {
   this.transitionMenu = new Transition(0,1000);
   this.transitionMenu.onUpdate = function(delta,percent){
     var amount = ((percent / 100) * 255) | 0;
-    var ccolor = self.selectedOption.color;
-    self.selectedOption.color = amount << 24 | (ccolor & 0xff0000) << 16 | (ccolor & 0xff00) << 8 | (ccolor & 0xff);
-    ccolor = self.stringOptions.color;
-    self.stringOptions.color = amount << 24 | (ccolor & 0xff0000) << 16 | (ccolor & 0xff00) << 8 | (ccolor & 0xff);
-    ccolor = self.stringOptions.outlineColor;
-    self.stringOptions.outlineColor = amount << 24 | (ccolor & 0xff0000) << 16 | (ccolor & 0xff00) << 8 | (ccolor & 0xff);
+    self.selectedOption.color = setChannel(self.selectedOption.color,'a',amount);
+    self.stringOptions.color = setChannel(self.stringOptions.color,'a',amount);
+    self.stringOptions.outlineColor = setChannel(self.stringOptions.outlineColor,'a',amount);
   };
 
   this.AddListener(window, 'keydown', KeyInput);

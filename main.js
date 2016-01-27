@@ -50,8 +50,8 @@ function init() {
     Scene.sceneManager = sceneManager;
     gameplayScene.sceneManager = sceneManager;
 
-    sceneManager.AddScene('Splash',Scene);
-    sceneManager.AddScene('GamePlay',gameplayScene);
+    sceneManager.AddScene('Splash', Scene);
+    sceneManager.AddScene('GamePlay', gameplayScene);
 
     sceneManager.ChangeScene('Splash');
     setTimeout(drawScene, 1000);
@@ -59,7 +59,7 @@ function init() {
 
   loadingFont = new SpriteFont(GL, 'fonts/Calibri.fnt');
   loadingFont.onLoad = function() {
-    ASSETMANAGER.AddFont('default',this);
+    ASSETMANAGER.AddFont('default', this);
     ASSETMANAGER.Load();
     console.log("font loaded");
   };
@@ -71,18 +71,34 @@ function init() {
 
 function fullscreen() {
   var element = document.getElementById('wrapper');
-  if (element.requestFullscreen) {
-    element.requestFullscreen();
-    FULLSCREEN = !FULLSCREEN;
-  } else if (element.msRequestFullscreen) {
-    element.msRequestFullscreen();
-    FULLSCREEN = !FULLSCREEN;
-  } else if (element.mozRequestFullScreen) {
-    element.mozRequestFullScreen();
-    FULLSCREEN = !FULLSCREEN;
-  } else if (element.webkitRequestFullscreen) {
-    element.webkitRequestFullscreen();
-    FULLSCREEN = !FULLSCREEN;
+  if (!FULLSCREEN) {
+    if (element.requestFullscreen) {
+      element.requestFullscreen();
+      FULLSCREEN = true;
+    } else if (element.msRequestFullscreen) {
+      element.msRequestFullscreen();
+      FULLSCREEN = true;
+    } else if (element.mozRequestFullScreen) {
+      element.mozRequestFullScreen();
+      FULLSCREEN = true;
+    } else if (element.webkitRequestFullscreen) {
+      element.webkitRequestFullscreen();
+      FULLSCREEN = true;
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+      FULLSCREEN = false;
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+      FULLSCREEN = false;
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+      FULLSCREEN = false;
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+      FULLSCREEN = false;
+    }
   }
 }
 

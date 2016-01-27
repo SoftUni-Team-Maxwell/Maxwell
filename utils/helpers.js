@@ -32,6 +32,33 @@ function smoothTransition(rgba, rgba2, amount) {
   return result;
 }
 
+function setChannel(source,channel,value){
+  if (isNaN(value)) {
+    console.error('SetChannel needs valid numeric value.');
+    return source;
+  }else {
+    value = value < 0 ? 0 : value > 255 ? 255 : value;
+  }
+  var result = source >>> 0;
+  switch (channel.toLowerCase()) {
+    case 'r':
+      result = (result & 0xffffff00) | value;
+      console.log(source.toString(16));
+      return result;
+    case 'g':
+      result = (result  & 0xffff00ff) | value << 8;
+      return result;
+    case 'b':
+      result = (result & 0xff00ffff) | value << 16;
+      return result;
+    case 'a':
+      result = (result & 0xffffff) | value << 24;
+      return result;
+    default:
+      return result;
+  }
+}
+
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
