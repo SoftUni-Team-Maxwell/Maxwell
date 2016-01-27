@@ -22,11 +22,20 @@ TrapScene.prototype.Init = function() {
 };
 
 TrapScene.prototype.InitTraps = function(){
-    this.activeTraps.push(new Trap(this.nextTrapX,this.traps[1],'block'));
+    var randomType = Math.floor(Math.random() * 2)
+    if(randomType===1){
+        this.activeTraps.push(new Trap(this.nextTrapX,this.traps[1],'block'));
+    }
+    else{
+        this.activeTraps.push(new Trap(this.nextTrapX,this.traps[0],'line'));
+    }
 };
 
 TrapScene.prototype.UpdateSelf = function(delta){
+
+    //must be fixed
     this.nextTrapX+=5;
+
     if(this.activeTraps.length<=2){
         this.InitTraps();
     }

@@ -23,7 +23,7 @@ function GamePlayScene(glContext, canvas) {
 
   //jumping
   var minY = 80;
-  var maxY = 660;
+  var maxY = 540;
   var jumping = false;
   var falling = false;
   var mousePosition = new Vec2(0, 0);
@@ -86,8 +86,7 @@ function GamePlayScene(glContext, canvas) {
       if (playerOptions.destinationRectangle.y < maxY) {
         playerOptions.destinationRectangle.y += 7;
       } else {
-        jumping = false;
-        falling = true;
+        playerOptions.destinationRectangle.y =maxY;
       }
     } else if (falling) {
       if (playerOptions.destinationRectangle.y > minY) {
