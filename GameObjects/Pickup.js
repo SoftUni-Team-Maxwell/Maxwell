@@ -59,5 +59,21 @@ Pickup.prototype = {
         return {points: 25, fill: 2};
     }
   },
-
 };
+
+function pickupType(index){
+  switch(index){
+    case 0:
+      return 'banana';
+    case 1:
+      return 'cherries';
+    case 2:
+      return 'carrot';
+    case 3:
+      return 'grapes';
+    case 4:
+      return 'orange';
+    case 5:
+      return 'tomato';
+  }
+}
