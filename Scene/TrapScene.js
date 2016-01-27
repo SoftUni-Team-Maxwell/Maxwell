@@ -17,7 +17,7 @@ TrapScene.prototype.Init = function() {
     this.traps.push(ASSETMANAGER.textures.lineTrap);
     this.traps.push(ASSETMANAGER.textures.blockTrap);
     this.activeTraps.push(new Trap(500,this.traps[0],'line'));
-    this.activeTraps.push(new Trap(1500,this.traps[1],'block'));
+    this.activeTraps.push(new Trap(1000,this.traps[1],'block'));
 
 };
 
@@ -64,8 +64,6 @@ TrapScene.prototype.DrawSelf = function(batch) {
             var b = activeTraps[i];
             if (b.onScreen && b.x > self.camera.x - b.width && b.x < self.camera.x + CANVAS.width) {
                 self.globalOptions.destinationRectangle = b.BoundingBox;
-                self.globalOptions.originX = b.width / 2;
-                self.globalOptions.originY = b.height / 2;
                 batch.DrawTexture(b.texture, self.globalOptions);
             }else if(b.onScreen && b.x < self.camera.x) {
                 b.onScreen = false;
