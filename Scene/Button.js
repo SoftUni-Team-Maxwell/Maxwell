@@ -1,6 +1,6 @@
 function Button(spriteNormal,spriteHover,spriteClick){
-  this.Hover = spriteHover;
   this.Normal = spriteNormal;
+  this.Hover = spriteHover;
   this.Click = spriteClick;
   this.boundingBox = new Rect(0,0,this.Normal.width,this.Normal.height);
   this.depth = 0;
@@ -41,7 +41,6 @@ Button.prototype = {
     }
   },
   Draw : function(batch){
-    // sprite.texture,null,new Rect(x,y,width,height),rotation,color,depth,originX,originY,flipX);
     batch.drawTexture(this.currentState.texture,null,this.boundingBox,this.rotation,this.currentState.color,this.depth,this.originX,this.originY,false);
   },
   Hovered : function(x,y){

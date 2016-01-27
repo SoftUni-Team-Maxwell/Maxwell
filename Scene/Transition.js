@@ -36,17 +36,20 @@ Transition.prototype.Update = function(delta){
   }
     if (this.onUpdate && this._startTime) {
       var current = this.CurrentPosition - this.startingPosition;
-      if (current > this.duration) {
+      if (current >= this.duration) {
+
+      }
+      var percent = 100*(current/this.duration);
+      if (percent > 100) {
+        percent = 100;
+
+        this.onUpdate(delta,percent);
         if (this.onFinish) {
           this.onFinish();
         }
         this.finished = true;
         this.active = false;
         return;
-      }
-      var percent = 100*(current/this.duration);
-      if (percent > 100) {
-        percent = 100;
       }
       this.onUpdate(delta,percent);
     }

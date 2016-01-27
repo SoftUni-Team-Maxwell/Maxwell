@@ -53,17 +53,16 @@ function SplashScreenScene(gl) {
       case 13:
         switch (self.selectedMenu) {
           case 0:
-            // var transition = new Transition(0,1000);
-            // transition.onUpdate = function(delta,percent){
-            //   var value = (100 - percent)/ 100;
-            //   self.gl.defaultShader.setUniformf(value,self.gl.defaultShader.uLocations.uFade);
-            //   self.gl.defaultFontShader.setUniformf(value,self.gl.defaultFontShader.uLocations.uFade);
-            // };
-            // transition.onFinish = function(){
-            //   self.sceneManager.ChangeScene('GamePlay');
-            //   self.sceneManager.currentTransition = null;
-            // };
-            // self.sceneManager.currentTransition = transition;
+            var transition = new Transition(0,3000);
+            transition.onUpdate = function(delta,percent){
+              var value = (100 - percent)/ 100;
+              self.gl.defaultShader.setUniformf(value,self.gl.defaultShader.uLocations.uFade);
+              self.gl.defaultFontShader.setUniformf(value,self.gl.defaultFontShader.uLocations.uFade);
+            };
+            transition.onFinish = function(){
+              self.sceneManager.currentTransition = null;
+            };
+            self.sceneManager.currentTransition = transition;
             self.sceneManager.ChangeScene('GamePlay');
 
             ASSETMANAGER.PlaySound('select');

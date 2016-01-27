@@ -7,7 +7,7 @@ function TrapScene(glContext){
     this.globalOptions = {
         'rotation': 0,
         'color': 0xffffffff,
-        'depth': 0
+        'depth': 20
     };
 }
 
@@ -41,7 +41,6 @@ TrapScene.prototype.UpdateSelf = function(delta){
     }
     var activeTraps = this.activeTraps;
     if (activeTraps.length > 0) {
-        var self = this;
         for (var i = 0; i < activeTraps.length; i++) {
             var b = activeTraps[i];
             if (b.onScreen && !b.hit && b.x > self.playerRect.left && b.x < self.playerRect.right ) {
@@ -64,6 +63,7 @@ TrapScene.prototype.DrawSelf = function(batch) {
             var b = activeTraps[i];
             if (b.onScreen && b.x > self.camera.x - b.width && b.x < self.camera.x + CANVAS.width) {
                 self.globalOptions.destinationRectangle = b.BoundingBox;
+                self.globalOptions.rotation = b.rotation;
                 batch.DrawTexture(b.texture, self.globalOptions);
             }else if(b.onScreen && b.x < self.camera.x) {
                 b.onScreen = false;

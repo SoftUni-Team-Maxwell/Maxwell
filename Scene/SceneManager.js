@@ -10,6 +10,7 @@ function SceneManager(glContext) {
   this._changeScene = function(scene){
     if (this._currentTransition) {
       this._currentTransition.Start();
+      this._nextScene = scene;
       this._isTransitioning = true;
     }
     else{
@@ -46,7 +47,10 @@ SceneManager.prototype.RemoveScene = function(id){
 SceneManager.prototype.Update = function(delta){
   if (this._isTransitioning) {
     this._currentTransition.Update(delta);
-    this._isTransitioning = !this._currentTransition.finished;
+    if (this._currentTransition.finished) {
+      this._isTransitioning = false;
+      this._currentScene = this._nextScene;
+    }
   }
   this._currentScene.Update(delta);
 };

@@ -99,11 +99,18 @@
     uniform float uFade;
 
     void main(){
+      if (uFade <= 0.000001 || vColor.a <= 0.000001) {
+        discard;
+      }
       vec4 c = vec4(1.0,1.0,1.0,1.0);
       if(useTexturing){
        c = texture2D(uSampler,vTexCoord);
       }
-      gl_FragColor = vColor * c * uFade;
+      if (c.a <= 0.00001) {
+        discard;
+      }
+      c.rgb *= uFade;
+      gl_FragColor = vColor * c;
     }
 
     </script>
@@ -123,6 +130,9 @@
 
 
     void main(){
+      if (uFade <= 0.000001) {
+        discard;
+      }
       vec4 result = vColor;
       if (uOutlineColor.a < 0.05) {
         float distance = texture2D(uSampler, vTexCoord).a;
@@ -139,8 +149,11 @@
         }
         result.a *= smoothstep(0.3 - uSmoothing, 0.3 + uSmoothing, distance);
       }
-
-      gl_FragColor = result * uFade;
+      if (result.a <= 0.00001) {
+        discard;
+      }
+      result *= uFade;
+      gl_FragColor = result;
     }
 
     </script>

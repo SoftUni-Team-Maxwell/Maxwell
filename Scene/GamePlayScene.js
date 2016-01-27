@@ -16,12 +16,11 @@ function GamePlayScene(glContext, canvas) {
   this.speed = 4;
   this.playback = false;
 
-  this.transition = new Transition(0,1000);
-  this.transition.onUpdate = function(delta,percent){
-    transition.onUpdate = function(delta,percent){
-      self.gl.defaultShader.setUniformf(percent/100,self.gl.defaultShader.uLocations.uFade);
-      self.gl.defaultFontShader.setUniformf(percent/100,self.gl.defaultFontShader.uLocations.uFade);
-    };
+  var self = this;
+  this.transition = new Transition(0, 500);
+  this.transition.onUpdate = function(delta, percent) {
+    self.gl.defaultShader.setUniformf(percent / 100, self.gl.defaultShader.uLocations.uFade);
+    self.gl.defaultFontShader.setUniformf(percent / 100, self.gl.defaultFontShader.uLocations.uFade);
   };
 
   /*------------------- Private Logic -------------*/
@@ -37,14 +36,14 @@ function GamePlayScene(glContext, canvas) {
   var mousePosition = new Vec2(0, 0);
 
   var playerOptions = {
-    sourceRectangle: new Rect(0.75,0.0,0.25,0.25),
-    destinationRectangle: new Rect(100,minY,100,100),
+    sourceRectangle: new Rect(0.75, 0.0, 0.25, 0.25),
+    destinationRectangle: new Rect(100, minY, 100, 100),
     flipX: true
   };
 
-  this.AddListener(CANVAS,'mousemove', MousePosition);
-  this.AddListener(CANVAS,'mousedown',MouseDown);
-  this.AddListener(CANVAS,'mouseup',MouseUp);
+  this.AddListener(CANVAS, 'mousemove', MousePosition);
+  this.AddListener(CANVAS, 'mousedown', MouseDown);
+  this.AddListener(CANVAS, 'mouseup', MouseUp);
 
   function MousePosition(e) {
     var rect = canvas.getBoundingClientRect();
@@ -94,7 +93,7 @@ function GamePlayScene(glContext, canvas) {
       if (playerOptions.destinationRectangle.y < maxY) {
         playerOptions.destinationRectangle.y += 7;
       } else {
-        playerOptions.destinationRectangle.y =maxY;
+        playerOptions.destinationRectangle.y = maxY;
       }
     } else if (falling) {
       if (playerOptions.destinationRectangle.y > minY) {
@@ -135,7 +134,7 @@ GamePlayScene.prototype.Init = function() {
   this.tootParticles = new ParticleEngine(gl, ASSETMANAGER.textures.bubble, 50);
   this.tootParticles.minWidth = 5;
   this.tootParticles.maxWidth = 25;
-  this.tootParticles.depth = -10;
+  this.tootParticles.depth = -1;
   this.tootParticles.life = 50;
   this.tootParticles.generationMethod = generateToots;
 
@@ -169,8 +168,9 @@ GamePlayScene.prototype.UpdateSelf = function(delta) {
     this.transition.Update(delta);
   }
   if (!this.playback) {
+    this.transition.Start();
     this.playback = true;
-    ASSETMANAGER.PlaySong('gameplay',true,3000,1500);
+    ASSETMANAGER.PlaySong('gameplay', true, 1000, 1000);
   }
   if (this.pause) {
     return;
@@ -179,9 +179,9 @@ GamePlayScene.prototype.UpdateSelf = function(delta) {
 };
 
 GamePlayScene.prototype.DrawSelf = function(batch) {
-  this.gl.defaultShader.setUniformMat4(this.camera.Matrix,this.gl.defaultShader.uLocations.uVwMatrix);
+  this.gl.defaultShader.setUniformMat4(this.camera.Matrix, this.gl.defaultShader.uLocations.uVwMatrix);
   this._drawSelf(batch);
-  this.gl.defaultShader.setUniformMat4(Identity,this.gl.defaultShader.uLocations.uVwMatrix);
+  this.gl.defaultShader.setUniformMat4(Identity, this.gl.defaultShader.uLocations.uVwMatrix);
 
 };
 

@@ -11,6 +11,7 @@ function HudScene(glContext){
     scaleX : 0.55,
     scaleY : 0.55,
     color : 0xff000000,
+    depth: 99,
     outlineColor : 0xffffffff,
     smoothing : 0.05
   };
@@ -18,6 +19,7 @@ function HudScene(glContext){
     scaleX:1.25,
     scaleY:1.25,
     color: 0x00111111,
+    depth: 99,
     outlineColor: 0x00dd9933,
     smoothing: 0.2
   };
@@ -27,12 +29,18 @@ function HudScene(glContext){
 
   this.transitionFadeIn.onUpdate = function(delta,percent){
     var amount = (percent / 100 * 255) | 0;
+    if (100 - percent > 50) {
+      self.gl.defaultShader.setUniformf((100 - percent)/ 100, self.gl.defaultShader.uLocations.uFade);
+    }
     self.pauseOptions.color = setChannel(self.pauseOptions.color,'a',amount);
     self.pauseOptions.outlineColor = setChannel(self.pauseOptions.outlineColor,'a',amount);
   };
 
   this.transitionFadeOut.onUpdate = function(delta,percent){
     var amount = ((100 - percent) / 100 * 255) | 0;
+    if (percent > 50) {
+      self.gl.defaultShader.setUniformf(percent/ 100, self.gl.defaultShader.uLocations.uFade);
+    }
     self.pauseOptions.color = setChannel(self.pauseOptions.color,'a',amount);
     self.pauseOptions.outlineColor = setChannel(self.pauseOptions.outlineColor,'a',amount);
   };
@@ -42,6 +50,7 @@ function HudScene(glContext){
 
 
   function transitionFinish(){
+    console.log('Tran sition finish');
     this.transitioning = false;
   }
 }
@@ -53,16 +62,17 @@ HudScene.prototype.Init = function(){
     return;
   }
   var self = this;
-  var normal = new Sprite(new Vec3(0,0,10),new Vec2(50,50),ASSETMANAGER.textures.pauseButton);
+  var normal = new Sprite(new Vec3(0,0,-100),new Vec2(50,50),ASSETMANAGER.textures.pauseButton);
   normal.color = 0xaaaaaaaa;
-  var hover = new Sprite(new Vec3(0,0,10),new Vec2(50,50),ASSETMANAGER.textures.pauseButton);
+  var hover = new Sprite(new Vec3(0,0,-100),new Vec2(50,50),ASSETMANAGER.textures.pauseButton);
   hover.color = 0xffffffff;
-  var click = new Sprite(new Vec3(0,0,10),new Vec2(50,50),ASSETMANAGER.textures.pauseButton);
+  var click = new Sprite(new Vec3(0,0,-100),new Vec2(50,50),ASSETMANAGER.textures.pauseButton);
   click.color = 0xffaaaaaa;
   this.font = ASSETMANAGER.fonts.default;
   this.pausedFont = ASSETMANAGER.fonts.cooperB;
   this.pauseOptions.sizeX = this.pausedFont.MeasureString('Paused').x;
   this.optionsButton = new Button(normal,hover,click);
+  this.optionsButton.depth = 100;
   this.optionsButton.position = new Vec3(CANVAS.width - 55,CANVAS.height - 55,100);
 
   this.AddListener(CANVAS,'mousedown',function(e){
@@ -91,9 +101,11 @@ HudScene.prototype.Init = function(){
 };
 
 HudScene.prototype.DrawSelf = function(batch){
+  var self = this;
   batch.drawString(this.font,this.score.toString(),CANVAS.width - 150,50,this.fontOptions);
   this.optionsButton.Draw(batch);
   if (this.transitioning) {
+    self.gl.defaultFontShader.setUniformf(1, self.gl.defaultFontShader.uLocations.uFade);
     batch.drawString(ASSETMANAGER.fonts.cooperB,'Paused',CANVAS.width/2 - (this.pauseOptions.sizeX * 1.25) / 2,350,this.pauseOptions);
   }
 };

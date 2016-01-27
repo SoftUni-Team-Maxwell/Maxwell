@@ -36,7 +36,7 @@ Trap.prototype = {
 
         var result = AARectColiding(this.boundingBox,rect,shrink);
         if (result === true) {
-            console.log("TRAP HITTT");
+            //console.log("TRAP HITTT");
         }
         return result;
     },
