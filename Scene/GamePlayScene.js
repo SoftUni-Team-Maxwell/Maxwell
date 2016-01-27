@@ -6,11 +6,14 @@ function GamePlayScene(glContext, canvas) {
   this.ground2 = null;
   this.lava = null;
   this.playerSheet = null;
-  this.particleEngine = null;
   this.tootParticles = null;
   this.canvas = canvas;
   this.hud = null;
+  this.pickups = null;
   this.pause = false;
+  this.camera = new Camera(new Mat4(1));
+  this.speed = 4;
+
 
   /*------------------- Private Logic -------------*/
 
@@ -23,7 +26,6 @@ function GamePlayScene(glContext, canvas) {
   var jumping = false;
   var falling = false;
   var mousePosition = new Vec2(0, 0);
-
 
   var playerOptions = {
     sourceRectangle: new Rect(0.75,0.0,0.25,0.25),
@@ -50,12 +52,13 @@ function GamePlayScene(glContext, canvas) {
     falling = true;
     jumping = false;
   }
-
+  var loop = 1;
   this._updateSelf = function(delta) {
     // Test score
-    this.hud.score++;
+    this.camera.x += this.speed;
+    playerOptions.destinationRectangle.x += this.speed;
     if (--cooldown < 0) {
-      cooldown = 5;
+      cooldown = 15 / this.speed;
       playerOptions.sourceRectangle.x -= 0.25;
       if (playerOptions.sourceRectangle.x < 0.0) {
         playerOptions.sourceRectangle.x = 0.75;
@@ -67,20 +70,17 @@ function GamePlayScene(glContext, canvas) {
       }
     }
 
-    this.background.position.x -= 2;
-    this.background2.position.x -= 2;
-
-    if (this.background2.position.x <= 0) {
-      this.background.position.x += this.canvas.width;
-      this.background2.position.x += this.canvas.width;
+    if (this.camera.x >= CANVAS.width * loop) {
+      loop++;
+      this.background.position.x += CANVAS.width;
+      this.background2.position.x += CANVAS.width;
+      this.ground.position.x += canvas.width;
+      this.ground2.position.x += canvas.width;
     }
-
-    this.ground.position.x -= 5;
-    this.ground2.position.x -= 5;
 
     //Handle jumping
     if (jumping === true) {
-      this.tootParticles.Generate(125, playerOptions.destinationRectangle.y + 20);
+      this.tootParticles.Generate(playerOptions.destinationRectangle.x, playerOptions.destinationRectangle.y + 20);
 
       if (playerOptions.destinationRectangle.y < maxY) {
         playerOptions.destinationRectangle.y += 7;
@@ -98,15 +98,10 @@ function GamePlayScene(glContext, canvas) {
     }
 
     this.tootParticles.Update(3);
-    this.particleEngine.Generate(mousePosition.x, mousePosition.y);
     this.hud.mousePosition = mousePosition;
-    this.particleEngine.Update(5);
+    this.pickups.playerRect = playerOptions.destinationRectangle;
 
 
-    if (this.ground2.position.x <= 0) {
-      this.ground.position.x += canvas.width;
-      this.ground2.position.x += canvas.width;
-    }
   };
 
   this._drawSelf = function(batch) {
@@ -116,9 +111,7 @@ function GamePlayScene(glContext, canvas) {
     batch.drawSprite(this.ground2);
     batch.DrawTexture(this.playerSheet, playerOptions);
     this.tootParticles.draw(batch);
-    this.particleEngine.draw(batch);
   };
-
 }
 
 GamePlayScene.prototype = Object.create(SceneNode.prototype);
@@ -130,15 +123,13 @@ GamePlayScene.prototype.Init = function() {
   var gl = this.gl;
   var canvas = this.canvas;
 
-  this.particleEngine = new ParticleEngine(gl, ASSETMANAGER.textures.bubble, 50);
   this.tootParticles = new ParticleEngine(gl, ASSETMANAGER.textures.bubble, 50);
   this.tootParticles.minWidth = 5;
   this.tootParticles.maxWidth = 25;
+  this.tootParticles.depth = -10;
   this.tootParticles.life = 50;
   this.tootParticles.generationMethod = generateToots;
-  this.particleEngine.minWidth = 10;
-  this.particleEngine.maxWidth = 50;
-  this.particleEngine.life = 25;
+
 
   this.background = new Sprite(new Vec3(0, 0, 0), new Vec2(canvas.width, canvas.height), ASSETMANAGER.textures.background);
   this.background2 = new Sprite(new Vec3(canvas.width, 0, 0), new Vec2(canvas.width, canvas.height), ASSETMANAGER.textures.background);
@@ -148,7 +139,12 @@ GamePlayScene.prototype.Init = function() {
   this.playerSheet = ASSETMANAGER.textures.player;
   this.hud = new HudScene(gl);
   this.hud.Init();
+  this.pickups = new PickupsScene(gl);
+  this.pickups.Init();
+  this.pickups.camera = this.camera;
+  this.pickups.hud = this.hud;
   this.AddNode(this.hud);
+  this.AddNode(this.pickups);
   this.initialized = true;
 };
 
@@ -161,7 +157,10 @@ GamePlayScene.prototype.UpdateSelf = function(delta) {
 };
 
 GamePlayScene.prototype.DrawSelf = function(batch) {
+  this.gl.defaultShader.setUniformMat4(this.camera.Matrix,this.gl.defaultShader.uLocations.uVwMatrix);
   this._drawSelf(batch);
+  this.gl.defaultShader.setUniformMat4(Identity,this.gl.defaultShader.uLocations.uVwMatrix);
+
 };
 
 function generateToots(x, y) {
@@ -183,7 +182,7 @@ function generateToots(x, y) {
   var count = this.maxCount;
 
   var width = getRandomInt(this.minWidth, this.maxWidth);
-  var dirX = getRandomInt(-100, -50) / 100.0;
+  var dirX = getRandomInt(-25, 0) / 100.0;
   var dirY = getRandomInt(-100, 0) / 100.0;
   var directionNormalized = new Vec2(dirX, dirY);
   directionNormalized.normalize();

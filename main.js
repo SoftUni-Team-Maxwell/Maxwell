@@ -2,6 +2,7 @@ var GL;
 var CANVAS;
 var batch;
 var loadingFont;
+var STATICMATRIX;
 var ASSETMANAGER;
 var FULLSCREEN = false;
 var INITIALSIZE;
@@ -16,9 +17,9 @@ function init() {
   CANVAS = document.getElementById('webgl-canvas');
   INITIALSIZE = CANVAS.getBoundingClientRect();
   GL = initWebGL(CANVAS);
-  var matrix = new Mat4().createOrtho(0, CANVAS.width, CANVAS.height, 0, -100, 1000);
-  GL.defaultShader.setUniformMat4(matrix, GL.defaultShader.uLocations.uPrMatrix);
-  GL.defaultFontShader.setUniformMat4(matrix, GL.defaultFontShader.uLocations.uPrMatrix);
+  STATICMATRIX = new Mat4().createOrtho(0, CANVAS.width, CANVAS.height, 0, -100, 1000);
+  GL.defaultShader.setUniformMat4(STATICMATRIX, GL.defaultShader.uLocations.uPrMatrix);
+  GL.defaultFontShader.setUniformMat4(STATICMATRIX, GL.defaultFontShader.uLocations.uPrMatrix);
   batch = new SpriteBatch(GL);
 
 
@@ -34,6 +35,12 @@ function init() {
   ASSETMANAGER.QueueToLoadTexture('grass', 'textures/grass.png');
   ASSETMANAGER.QueueToLoadTexture('lava', 'textures/lava.png');
   ASSETMANAGER.QueueToLoadTexture('player', 'textures/playerSprite.png');
+  ASSETMANAGER.QueueToLoadTexture('banana', 'textures/banana.png');
+  ASSETMANAGER.QueueToLoadTexture('carrot', 'textures/carrot.png');
+  ASSETMANAGER.QueueToLoadTexture('cherries', 'textures/cherries.png');
+  ASSETMANAGER.QueueToLoadTexture('grapes', 'textures/grapes.png');
+  ASSETMANAGER.QueueToLoadTexture('orange', 'textures/orange.png');
+  ASSETMANAGER.QueueToLoadTexture('tomato', 'textures/tomato.png');
 
   ASSETMANAGER.onProgressUpdate = function(percent, msg) {
     console.log(percent + '% - ' + msg);
@@ -122,10 +129,9 @@ function loading(msg) {
   });
   batch.End();
 }
-
+var counter = 0.01;
 function drawScene() {
   GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-
   batch.begin();
   sceneManager.Draw(batch);
 

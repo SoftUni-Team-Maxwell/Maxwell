@@ -1,6 +1,6 @@
 function Rect(x, y, width, heigth) {
   if (isNaN(x) || isNaN(y) || isNaN(width) || isNaN(heigth)) {
-    throw 'Cannot construct Vec3 from non number variables';
+    throw 'Cannot construct Rect from non number variables';
   }
   this._x = x;
   this._y = y;
@@ -37,6 +37,10 @@ Rect.prototype = {
     if (isNaN(value)) return;
     this._height = value;
   },
+  get top() { return this._y+this._height;},
+  get bottom() { return this._y;},
+  get left() { return this._x;},
+  get right() { return this._x+this._width;},
   ContainsPoint : function(xPos,yPos){
     var x,y;
     if (xPos instanceof Vec2) {

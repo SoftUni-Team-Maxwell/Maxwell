@@ -62,3 +62,18 @@ function setChannel(source,channel,value){
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
 }
+
+function AARectColiding(rect1,rect2,shrink){
+
+  if (rect1 instanceof Rect && rect2 instanceof Rect) {
+    if (!shrink) {
+      shrink = 0;
+    }
+    if (rect1.left < rect2.right - shrink && rect1.right > rect2.left + shrink &&
+       rect1.bottom < rect2.top - shrink && rect1.top > rect2.bottom + shrink) {
+        return true;
+    }else {
+      return false;
+    }
+  }
+}
