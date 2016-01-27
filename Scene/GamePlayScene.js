@@ -10,6 +10,7 @@ function GamePlayScene(glContext, canvas) {
   this.canvas = canvas;
   this.hud = null;
   this.pickups = null;
+  this.traps = null;
   this.pause = false;
   this.camera = new Camera(new Mat4(1));
   this.speed = 4;
@@ -100,6 +101,7 @@ function GamePlayScene(glContext, canvas) {
     this.tootParticles.Update(3);
     this.hud.mousePosition = mousePosition;
     this.pickups.playerRect = playerOptions.destinationRectangle;
+    this.traps.playerRect = playerOptions.destinationRectangle;
 
 
   };
@@ -143,8 +145,14 @@ GamePlayScene.prototype.Init = function() {
   this.pickups.Init();
   this.pickups.camera = this.camera;
   this.pickups.hud = this.hud;
+
+  this.traps = new TrapScene(gl);
+  this.traps.Init();
+  this.traps.camera = this.camera;
+
   this.AddNode(this.hud);
   this.AddNode(this.pickups);
+  this.AddNode(this.traps);
   this.initialized = true;
 };
 

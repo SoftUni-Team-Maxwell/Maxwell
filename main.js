@@ -41,6 +41,8 @@ function init() {
   ASSETMANAGER.QueueToLoadTexture('grapes', 'textures/grapes.png');
   ASSETMANAGER.QueueToLoadTexture('orange', 'textures/orange.png');
   ASSETMANAGER.QueueToLoadTexture('tomato', 'textures/tomato.png');
+  ASSETMANAGER.QueueToLoadTexture('blockTrap', 'textures/blockTrap.png');
+  ASSETMANAGER.QueueToLoadTexture('lineTrap', 'textures/lineTrap.png');
 
   ASSETMANAGER.onProgressUpdate = function(percent, msg) {
     console.log(percent + '% - ' + msg);
