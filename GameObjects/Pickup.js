@@ -38,7 +38,6 @@ Pickup.prototype = {
       return false;
     }
     var result = AARectColiding(this.boundingBox,rect,shrink);
-    console.log('Result:' + result);
     if (result === true) {
       this.pickedUp = true;
     }

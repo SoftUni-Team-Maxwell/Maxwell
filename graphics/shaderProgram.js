@@ -57,6 +57,7 @@ function ShaderProgram(gl, vsSource, fsSource) {
   this.uLocations.uVwMatrix = gl.getUniformLocation(this.id, 'uVwMatrix');
   this.uLocations.uModelMatrix = gl.getUniformLocation(this.id, 'uModelMatrix');
   this.uLocations.uSampler = gl.getUniformLocation(this.id, 'uSampler');
+  this.uLocations.uFade = gl.getUniformLocation(this.id, 'uFade');
   this.uLocations.useTexturing = gl.getUniformLocation(this.id, 'useTexturing');
   if (!makeDefault) {
     this.uLocations.uSmoothing = gl.getUniformLocation(this.id,'uSmoothing');
@@ -68,6 +69,7 @@ function ShaderProgram(gl, vsSource, fsSource) {
   this.setUniformMat4(identity, this.uLocations.uPrMatrix);
   this.setUniformMat4(identity, this.uLocations.uVwMatrix);
   this.setUniformMat4(identity, this.uLocations.uModelMatrix);
+  this.setUniformf(1, this.uLocations.uFade);
 }
 
 ShaderProgram.prototype = {

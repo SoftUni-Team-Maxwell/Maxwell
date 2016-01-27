@@ -60,6 +60,7 @@ PickupsScene.prototype.UpdateSelf = function(delta){
       if (b.active && !b.pickedUp && b.x > self.playerRect.left && b.x < self.playerRect.right ) {
         var result = b.CheckCollision(self.playerRect,20);
         if (result) {
+          ASSETMANAGER.PlaySound('pop');
           b.info = b.getTypeInfo();
           self.hud.score += b.info.points;
         }

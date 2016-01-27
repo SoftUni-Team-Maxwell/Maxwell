@@ -3,7 +3,7 @@ function AssetManager(glContext){
   this.images = [];
   this.textures = {};
   this.sounds = {};
-  this.song = {};
+  this.songs = {};
   this.sprites = {};
   this.fonts = {};
   this.queue = {
@@ -15,11 +15,32 @@ function AssetManager(glContext){
   };
   this.loaded = 0;
   this.total = 0;
-
+  this.songGain = AUDIO.createGain();
+  this.soundGain = AUDIO.createGain();
+  this._songVolume = 1;
+  this._soundVolume = 1;
 }
 
 AssetManager.prototype = {
   constructor: AssetManager,
+  get SoundVolume() {return this._soundVolume;},
+  set SoundVolume(value) {
+    if (isNaN(value)) {
+      return;
+    }
+    var v = clamp(value,0,1);
+    this._soundVolume = v;
+    this.soundGain.gain.value = v;
+  },
+  get SongVolume() {return this._songVolume;},
+  set SongVolume(value) {
+    if (isNaN(value)) {
+      return;
+    }
+    var v = clamp(value,0,1);
+    this._songVolume = v;
+    this.songGain.gain.value = v;
+  },
   AddTexture: function(id,texture){
     this.textures[id] = texture;
   },
@@ -27,7 +48,7 @@ AssetManager.prototype = {
     this.sounds[id] = sound;
   },
   AddSong: function(id,song){
-    this.song[id] = song;
+    this.songs[id] = song;
   },
   AddSprite: function(id,sprite){
     this.sprites[id] = sprite;
@@ -42,7 +63,7 @@ AssetManager.prototype = {
     this.queue.sounds.push({'id' : id, url : soundUrl});
   },
   QueueToLoadSong: function(id,songUrl){
-    this.queue.song.push({'id' : id, url : songUrl});
+    this.queue.songs.push({'id' : id, url : songUrl});
   },
   QueueToLoadSprite: function(id,textureId,options){
     this.queue.sprites.push({'id' : id, texId:textureId,'options' : options});
@@ -61,10 +82,12 @@ AssetManager.prototype = {
       this.LoadImage(i, item);
     }
     for (var s = 0; s < q.sounds.length; s++) {
-      // TODO(Inspix): Load sounds;
+        var sound = q.sounds[s];
+        this.LoadSound(sound);
     }
     for (var snd = 0; snd < q.songs.length; snd++) {
-      // TODO(Inspix): Load songs;
+        var song = q.songs[snd];
+        this.LoadSong(song);
     }
     for (var sp = 0; sp < q.sprites.length; sp++) {
       var sprite = q.sprites[sp];
@@ -82,7 +105,6 @@ AssetManager.prototype = {
     }
     for (var f = 0; f < q.fonts.length; f++) {
       var font = q.fonts[f];
-      // TODO(Inspix): Fix loading issues..due to no function creation in loop shananigans...
       this.LoadFont(font);
 
     }
@@ -124,7 +146,6 @@ AssetManager.prototype = {
     var self = this;
     var current = new SpriteFont(GL,font.url);
     current.onLoad = function(){
-      console.log('onload');
       self.loaded++;
       self.onProgressUpdate(100*(self.loaded/self.total),'fonts/' + font.id);
       self.fonts[font.id] = current;
@@ -136,11 +157,119 @@ AssetManager.prototype = {
     };
     current.Init();
   },
+  LoadSound : function(sound){
+    this.LoadAudio(sound,false);
+  },
+  LoadSong : function(song){
+    this.LoadAudio(song,true);
+  },
+  LoadAudio : function(item,song){
+    var request = new XMLHttpRequest();
+    request.open('GET', item.url, true);
+    request.responseType = 'arraybuffer';
+    var self = this;
+    request.onload = function() {
+      AUDIO.decodeAudioData(request.response, function(buffer) {
+        if (song) {
+          self.songs[item.id] = buffer;
+        }else {
+          self.sounds[item.id] = buffer;
+        }
+        self.loaded++;
+        self.onProgressUpdate(100*(self.loaded/self.total),'sounds/' + item.id);
+        if (self.isLoaded()) {
+          if (self.onLoad) {
+            self.onLoad();
+          }
+        }
+      }, function(error){
+        console.log(error);
+      });
+    };
+    request.send();
+  },
   onLoad : null,
   isLoaded : function isLoaded(){
     if (this.total <= this.loaded) {
       return true;
     }
     return false;
+  },
+  PlaySound: function(sound){
+    var buffer = this.sounds[sound];
+    if (!buffer) {
+      return;
+    }
+    var source = AUDIO.createBufferSource();
+    source.buffer = buffer;
+    source.connect(this.soundGain);
+    this.soundGain.gain.value = this.SoundVolume;
+    this.soundGain.connect(AUDIO.destination);
+    source.start(0);
+  },
+  PlaySong: function(song,loop,fadeOut,fadeIn){
+    if (this.fadeInInterval) {
+      return;
+    }
+    var self = this;
+
+    if (self.currentSong) {
+      var next = {
+        id : song,
+        'loop' : loop,
+        'fadeIn' : fadeIn
+      };
+      self.StopCurrentSong(fadeOut,next);
+      return;
+    }
+    var buffer = self.songs[song];
+    if (!buffer) {
+      return;
+    }
+    if (fadeIn) {
+      self.songGain.gain.value = 0;
+      var interval = fadeIn/50;
+      self.fadeInInterval = setInterval(function(){
+        self.songGain.gain.value += self.SongVolume / interval;
+        if (self.songGain.gain.value >= self.SongVolume) {
+          clearInterval(self.fadeInInterval);
+          self.fadeInInterval = null;
+        }
+      },50);
+    } else {
+      self.songGain.gain.value = self.SongVolume;
+    }
+    self.currentSong = AUDIO.createBufferSource();
+    self.currentSong.buffer = buffer;
+    self.currentSong.connect(self.songGain);
+    self.songGain.connect(AUDIO.destination);
+    self.currentSong.start(0);
+    self.currentSong.loop = loop;
+  },
+  StopCurrentSong : function(fade,next){
+    if (this.songInterval) {
+      return;
+    }
+    var self = this;
+    if (self.currentSong) {
+      if (fade) {
+        var intervals = fade / 50;
+        self.songInterval = setInterval(function(){
+          self.songGain.gain.value -= 1 / intervals;
+          if (self.songGain.gain.value <= 0) {
+            clearInterval(self.songInterval);
+            self.currentSong.stop();
+            self.currentSong = null;
+            self.songInterval = null;
+            if (next) {
+              self.PlaySong(next.id,next.loop,null,next.fadeIn);
+            }
+          }
+        },50);
+      }else {
+        self.currentSong.stop();
+        self.currentSong = null;
+      }
+    }
   }
 };

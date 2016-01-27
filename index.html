@@ -96,13 +96,14 @@
 
     uniform bool useTexturing;
     uniform sampler2D uSampler;
+    uniform float uFade;
 
     void main(){
       vec4 c = vec4(1.0,1.0,1.0,1.0);
       if(useTexturing){
        c = texture2D(uSampler,vTexCoord);
       }
-      gl_FragColor = vColor * c;
+      gl_FragColor = vColor * c * uFade;
     }
 
     </script>
@@ -118,6 +119,7 @@
     uniform float uSmoothing;
     uniform vec4 uOutlineColor;
     uniform sampler2D uSampler;
+    uniform float uFade;
 
 
     void main(){
@@ -138,7 +140,7 @@
         result.a *= smoothstep(0.3 - uSmoothing, 0.3 + uSmoothing, distance);
       }
 
-      gl_FragColor = result;
+      gl_FragColor = result * uFade;
     }
 
     </script>

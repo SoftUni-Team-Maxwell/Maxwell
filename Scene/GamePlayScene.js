@@ -14,7 +14,15 @@ function GamePlayScene(glContext, canvas) {
   this.pause = false;
   this.camera = new Camera(new Mat4(1));
   this.speed = 4;
+  this.playback = false;
 
+  this.transition = new Transition(0,1000);
+  this.transition.onUpdate = function(delta,percent){
+    transition.onUpdate = function(delta,percent){
+      self.gl.defaultShader.setUniformf(percent/100,self.gl.defaultShader.uLocations.uFade);
+      self.gl.defaultFontShader.setUniformf(percent/100,self.gl.defaultFontShader.uLocations.uFade);
+    };
+  };
 
   /*------------------- Private Logic -------------*/
 
@@ -157,6 +165,13 @@ GamePlayScene.prototype.Init = function() {
 
 
 GamePlayScene.prototype.UpdateSelf = function(delta) {
+  if (!this.transition.finished) {
+    this.transition.Update(delta);
+  }
+  if (!this.playback) {
+    this.playback = true;
+    ASSETMANAGER.PlaySong('gameplay',true,3000,1500);
+  }
   if (this.pause) {
     return;
   }

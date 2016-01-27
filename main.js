@@ -2,6 +2,7 @@ var GL;
 var CANVAS;
 var batch;
 var loadingFont;
+var AUDIO;
 var STATICMATRIX;
 var ASSETMANAGER;
 var FULLSCREEN = false;
@@ -14,6 +15,15 @@ window.onerror = function(msg, url, line) {
 };
 
 function init() {
+  try {
+    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+    AUDIO = new AudioContext();
+  }
+  catch(e) {
+    alert('Web Audio API is not supported in this browser');
+  }
+
+
   CANVAS = document.getElementById('webgl-canvas');
   INITIALSIZE = CANVAS.getBoundingClientRect();
   GL = initWebGL(CANVAS);
@@ -43,9 +53,13 @@ function init() {
   ASSETMANAGER.QueueToLoadTexture('tomato', 'textures/tomato.png');
   ASSETMANAGER.QueueToLoadTexture('blockTrap', 'textures/blockTrap.png');
   ASSETMANAGER.QueueToLoadTexture('lineTrap', 'textures/lineTrap.png');
+  ASSETMANAGER.QueueToLoadSound('pop', 'sounds/pop1.ogg');
+  ASSETMANAGER.QueueToLoadSound('click', 'sounds/menuClick.ogg');
+  ASSETMANAGER.QueueToLoadSound('select', 'sounds/menuSelect.mp3');
+  ASSETMANAGER.QueueToLoadSong('gameplay', 'sounds/gameplaySong.ogg');
+  ASSETMANAGER.QueueToLoadSong('menu', 'sounds/menuSong.ogg');
 
   ASSETMANAGER.onProgressUpdate = function(percent, msg) {
-    console.log(percent + '% - ' + msg);
     cent = percent / 100;
     loading(msg);
   };
@@ -63,6 +77,7 @@ function init() {
     sceneManager.AddScene('GamePlay', gameplayScene);
 
     sceneManager.ChangeScene('Splash');
+    ASSETMANAGER.PlaySong('menu',true,null,2000);
     setTimeout(drawScene, 1000);
   };
 

@@ -22,7 +22,7 @@ TrapScene.prototype.Init = function() {
 };
 
 TrapScene.prototype.InitTraps = function(){
-    var randomType = Math.floor(Math.random() * 2)
+    var randomType = Math.floor(Math.random() * 2);
     if(randomType===1){
         this.activeTraps.push(new Trap(this.nextTrapX,this.traps[1],'block'));
     }
@@ -32,9 +32,9 @@ TrapScene.prototype.InitTraps = function(){
 };
 
 TrapScene.prototype.UpdateSelf = function(delta){
-
+    var self = this;
     //must be fixed
-    this.nextTrapX+=5;
+    this.nextTrapX = self.playerRect.right + CANVAS.width;
 
     if(this.activeTraps.length<=2){
         this.InitTraps();
