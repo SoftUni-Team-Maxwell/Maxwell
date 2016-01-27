@@ -1,4 +1,5 @@
 function Trap(x,texture,type){
+    this.rotation = 0;
     this.boundingBox = this.GenerateBoundingBox(x,type);
     this.texture = texture;
     this.type = type;
@@ -52,6 +53,7 @@ Trap.prototype = {
         if(type ==='line'){
             var random = Math.floor(Math.random() * 2);
             if(random===1){
+                this.rotation = 180;
                 return 540;
             }
             return 80;

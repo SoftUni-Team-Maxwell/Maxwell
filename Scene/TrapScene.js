@@ -46,7 +46,7 @@ TrapScene.prototype.UpdateSelf = function(delta){
             if (b.onScreen && !b.hit && b.x > self.playerRect.left && b.x < self.playerRect.right ) {
                 var result = b.CheckCollision(self.playerRect,20);
                 if (result) {
-                    console.log("Game Over");
+                    self.parent.gameOver = true;
                 }
             }
         }
@@ -61,6 +61,9 @@ TrapScene.prototype.DrawSelf = function(batch) {
         var self = this;
         for (var i = 0; i < activeTraps.length; i++) {
             var b = activeTraps[i];
+            self.globalOptions.rotation = b.rotation;
+            self.globalOptions.originX = b.width/2;
+            self.globalOptions.originY = b.height/2;
             if (b.onScreen && b.x > self.camera.x - b.width && b.x < self.camera.x + CANVAS.width) {
                 self.globalOptions.destinationRectangle = b.BoundingBox;
                 self.globalOptions.rotation = b.rotation;
