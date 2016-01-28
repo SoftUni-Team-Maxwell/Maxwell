@@ -66,8 +66,9 @@ function GamePlayScene(glContext, canvas) {
     // Test score
     this.camera.x += this.speed * delta;
     playerOptions.destinationRectangle.x += this.speed * delta;
+    cooldown -= delta;
     if (--cooldown < 0) {
-      cooldown = 15 / this.speed * delta;
+      cooldown = 15 / this.speed;
       playerOptions.sourceRectangle.x -= 0.25;
       if (playerOptions.sourceRectangle.x < 0.0) {
         playerOptions.sourceRectangle.x = 0.75;

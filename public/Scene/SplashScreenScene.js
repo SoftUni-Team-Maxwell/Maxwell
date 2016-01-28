@@ -189,7 +189,7 @@ SplashScreenScene.prototype.UpdateSelf = function(delta) {
         this.stringOptions.destinationC = this.stringOptions.originalC;
         this.stringOptions.originalC = temp;
       }
-      this.stringOptions.outlineColor = smoothTransition(this.stringOptions.outlineColor, this.stringOptions.destinationC, 5);
+      this.stringOptions.outlineColor = smoothTransition(this.stringOptions.outlineColor, this.stringOptions.destinationC, 5 * delta);
     }
   }
 
