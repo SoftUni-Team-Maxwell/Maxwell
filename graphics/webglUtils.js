@@ -1,5 +1,5 @@
 function initWebGL(canvas){
-  var gl = canvas.getContext('webgl',{antialias: true});
+  var gl = canvas.getContext('webgl',{antialias: true}) || canvas.getContext('experimental-webgl',{antialias: true});
 
   if (!gl) {
     throw 'Crap no WebGL context available';

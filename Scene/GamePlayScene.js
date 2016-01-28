@@ -64,10 +64,10 @@ function GamePlayScene(glContext, canvas) {
   var loop = 1;
   this._updateSelf = function(delta) {
     // Test score
-    this.camera.x += this.speed;
-    playerOptions.destinationRectangle.x += this.speed;
+    this.camera.x += this.speed * delta;
+    playerOptions.destinationRectangle.x += this.speed * delta;
     if (--cooldown < 0) {
-      cooldown = 15 / this.speed;
+      cooldown = 15 / this.speed * delta;
       playerOptions.sourceRectangle.x -= 0.25;
       if (playerOptions.sourceRectangle.x < 0.0) {
         playerOptions.sourceRectangle.x = 0.75;
@@ -92,20 +92,20 @@ function GamePlayScene(glContext, canvas) {
       this.tootParticles.Generate(playerOptions.destinationRectangle.x, playerOptions.destinationRectangle.y + 20);
 
       if (playerOptions.destinationRectangle.y < maxY) {
-        playerOptions.destinationRectangle.y += 7;
+        playerOptions.destinationRectangle.y += 7 * delta;
       } else {
         playerOptions.destinationRectangle.y = maxY;
       }
     } else if (falling) {
       if (playerOptions.destinationRectangle.y > minY) {
-        playerOptions.destinationRectangle.y -= 7;
+        playerOptions.destinationRectangle.y -= 7 * delta;
       } else {
         playerOptions.destinationRectangle.y = minY;
         falling = false;
       }
     }
 
-    this.tootParticles.Update(3);
+    this.tootParticles.Update(3 * delta);
     this.hud.mousePosition = mousePosition;
     this.pickups.playerRect = playerOptions.destinationRectangle;
     this.traps.playerRect = playerOptions.destinationRectangle;

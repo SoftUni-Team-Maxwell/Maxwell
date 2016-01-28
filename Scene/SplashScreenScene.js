@@ -168,16 +168,16 @@ SplashScreenScene.prototype.DrawSelf = function(batch) {
 SplashScreenScene.prototype.UpdateSelf = function(delta) {
   if (this.initialized) {
     this.background.rotation = 0;
-    this.LogoRotation();
+    this.LogoRotation(delta);
     if (this.about && !this.aboutMoved) {
-      this.offset-= 25;
+      this.offset-= 25 * delta;
       if (this.offset <= -1500) {
         this.offset = -1500;
         this.aboutMoved = true;
       }
     }
     if (!this.about && this.aboutMoved) {
-      this.offset+= 25;
+      this.offset+= 25 * delta;
       if (this.offset >= 0) {
         this.offset = 0;
         this.aboutMoved = false;
@@ -215,10 +215,10 @@ SplashScreenScene.prototype.Init = function() {
   this.initialized = true;
 };
 
-SplashScreenScene.prototype.LogoRotation = function() {
+SplashScreenScene.prototype.LogoRotation = function(delta) {
   var center = CANVAS.width / 2 - this.logo.width / 2;
   if (this.logo.position.x < center - 10 || this.logo.position.x > center + 20) {
-    this.logo.position.x -= 10;
+    this.logo.position.x -= 10 * delta;
     if (this.logo.position.x <= -400) {
       this.logo.position.x = CANVAS.width;
     }
@@ -226,7 +226,7 @@ SplashScreenScene.prototype.LogoRotation = function() {
     if (!this.transitionMenu.active && !this.transitionMenu.finished) {
       this.transitionMenu.Start();
     }else if (this.transitionMenu.active && !this.transitionMenu.finished) {
-      this.transitionMenu.Update(1);
+      this.transitionMenu.Update(delta);
     }
   }
 };

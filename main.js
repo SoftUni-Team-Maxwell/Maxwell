@@ -151,13 +151,18 @@ function loading(msg) {
   batch.End();
 }
 var counter = 0.01;
+var prev = performance.now();
 function drawScene() {
   GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+  var current = performance.now();
+  var delta = current - prev;
+  delta /= 20;
+  console.log(delta);
+  prev = current;
+  sceneManager.Update(delta);
   batch.begin();
   sceneManager.Draw(batch);
-
   batch.End();
-  sceneManager.Update(1);
 
   requestAnimationFrame(drawScene);
 }
