@@ -41,9 +41,52 @@ function SplashScreenScene(gl) {
 
   this.AddListener(window, 'keydown', KeyInput);
 
+  this.offset = 0;
+  this.about = false;
+  this.aboutMoved = false;
   this.menuOptions = ['New Game', 'About Us', 'Exit'];
+
+  this.aboutOptions = [
+    {
+      text:'Inspix',
+      texture: ASSETMANAGER.textures.Inspix,
+      options:
+      {
+        destinationRectangle: new Rect(1550,300,100,100),
+      },
+      textPosition: new Vec3(1675,375,0),
+    },
+    {
+      text:'Bozhidar Tonchev',
+      texture: ASSETMANAGER.textures.Bojidar,
+      options:
+      {
+        destinationRectangle: new Rect(2450,215,100,100),
+      },
+      textPosition: new Vec3(1825,295,0),
+    },
+    {
+      text:'nedyalkovV',
+      texture: ASSETMANAGER.textures.Vasko,
+      options:
+      {
+        destinationRectangle: new Rect(1675,115,100,100),
+      },
+      textPosition: new Vec3(1800,200,0),
+    },
+    {
+      text:'craghagBg',
+      texture: ASSETMANAGER.textures.Ivaylo,
+      options:
+      {
+        destinationRectangle: new Rect(2350,50,100,100),
+      },
+      textPosition: new Vec3(1975,125,0),
+    }
+  ];
   this.menuWidths = [];
   this.selectedMenu = 0;
+  this.aboutSelectedIndex = 0;
 
 
   function KeyInput(e) {
@@ -51,6 +94,9 @@ function SplashScreenScene(gl) {
 
     switch (e.keyCode) {
       case 13:
+        if (self.about) {
+          break;
+        }
         switch (self.selectedMenu) {
           case 0:
             var transition = new Transition(0,3000);
@@ -63,25 +109,41 @@ function SplashScreenScene(gl) {
               self.sceneManager.currentTransition = null;
             };
             self.sceneManager.currentTransition = transition;
-            self.sceneManager.ChangeScene('GamePlay');
+            var scene = new GamePlayScene(GL,CANVAS);
+            scene.Init();
+            self.sceneManager.ChangeScene(scene);
 
             ASSETMANAGER.PlaySound('select');
 
             break;
           case 1:
+            self.about = true;
             break;
           case 2:
             break;
         }
         break;
+      case 27:
+        if (self.about) self.about = false;
+        break;
       case 40:
-        if (self.selectedMenu < 2) {
+        if (self.about) {
+          if (self.aboutSelectedIndex < 3) {
+            self.aboutSelectedIndex++;
+            ASSETMANAGER.PlaySound('click');
+          }
+        }else if (self.selectedMenu < 2) {
           self.selectedMenu++;
           ASSETMANAGER.PlaySound('click');
         }
         break;
       case 38:
-        if (self.selectedMenu > 0) {
+        if (self.about) {
+          if (self.aboutSelectedIndex > 0) {
+            self.aboutSelectedIndex--;
+            ASSETMANAGER.PlaySound('click');
+          }
+        }else if (self.selectedMenu > 0) {
           self.selectedMenu--;
           ASSETMANAGER.PlaySound('click');
         }
@@ -107,6 +169,20 @@ SplashScreenScene.prototype.UpdateSelf = function(delta) {
   if (this.initialized) {
     this.background.rotation = 0;
     this.LogoRotation();
+    if (this.about && !this.aboutMoved) {
+      this.offset-= 25;
+      if (this.offset <= -1500) {
+        this.offset = -1500;
+        this.aboutMoved = true;
+      }
+    }
+    if (!this.about && this.aboutMoved) {
+      this.offset+= 25;
+      if (this.offset >= 0) {
+        this.offset = 0;
+        this.aboutMoved = false;
+      }
+    }
     if (this.transitionMenu.finished) {
       if (this.stringOptions.outlineColor >>> 0 === this.stringOptions.destinationC >>> 0) {
         var temp = this.stringOptions.destinationC;
@@ -157,16 +233,35 @@ SplashScreenScene.prototype.LogoRotation = function() {
 
 SplashScreenScene.prototype.DrawMenu = function() {
   var font = this.font;
-  if (font.initialized) {
-    var lineSpacing = 350;
-    for (var i = 0; i < this.menuOptions.length; i++) {
-      if (i === this.selectedMenu) {
-        batch.drawString(font, this.menuOptions[i], CANVAS.width / 2 - this.menuWidths[i] / 2, lineSpacing, this.stringOptions);
-      } else {
-        batch.drawString(font, this.menuOptions[i], CANVAS.width / 2 - this.menuWidths[i] / 2, lineSpacing, this.selectedOption);
-      }
+  var lineSpacing = 350;
+  for (var i = 0; i < this.menuOptions.length; i++) {
+    if (i === this.selectedMenu) {
+      batch.drawString(font, this.menuOptions[i], (CANVAS.width / 2 - this.menuWidths[i] / 2) + this.offset, lineSpacing, this.stringOptions);
+    } else {
+      batch.drawString(font, this.menuOptions[i], (CANVAS.width / 2 - this.menuWidths[i] / 2) + this.offset, lineSpacing, this.selectedOption);
+    }
 
-      lineSpacing -= 75;
+    lineSpacing -= 75;
+  }
+  if (this.about || this.aboutMoved) {
+    for (var j = 0; j < this.aboutOptions.length; j++) {
+      var c = this.aboutOptions[j];
+      if (j === this.aboutSelectedIndex) {
+        batch.drawString(font, c.text, c.textPosition.x + this.offset, c.textPosition.y, this.stringOptions);
+      }else {
+        batch.drawString(font, c.text, c.textPosition.x + this.offset, c.textPosition.y, this.selectedOption);
+      }
+      var options = {
+        destinationRectangle: c.options.destinationRectangle.Clone()
+      };
+      options.destinationRectangle.x += this.offset;
+      if (j === this.aboutSelectedIndex) {
+        options.destinationRectangle.x -= 5;
+        options.destinationRectangle.y -= 5;
+        options.destinationRectangle.width += 10;
+        options.destinationRectangle.height += 10;
+      }
+      batch.DrawTexture(c.texture,options);
     }
   }
 };

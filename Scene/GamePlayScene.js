@@ -118,6 +118,11 @@ function GamePlayScene(glContext, canvas) {
     batch.drawSprite(this.background2);
     batch.drawSprite(this.ground);
     batch.drawSprite(this.ground2);
+    if (jumping) {
+      playerOptions.sourceRectangle.x = 0.75;
+      playerOptions.sourceRectangle.y = 0.0;
+      cooldown = 15 / this.speed;
+    }
     batch.DrawTexture(this.playerSheet, playerOptions);
     this.tootParticles.draw(batch);
   };
@@ -169,12 +174,12 @@ GamePlayScene.prototype.UpdateSelf = function(delta) {
     this.transition.Update(delta);
   }
   if (!this.playback) {
+    this.hud.EnableListeners();
     this.transition.Start();
     this.playback = true;
     ASSETMANAGER.PlaySong('gameplay', true, 1000, 1000);
   }
   if (this.gameOver) {
-    this
     return;
   }
   if (this.pause) {

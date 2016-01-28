@@ -13,15 +13,14 @@ function SceneNode(glContext){
       var c = l[i];
       c.element.removeEventListener(c.event,c.func);
     }
+    this.initialized = false;
     this.children = [];
-    this.gl = null;
-    this.sceneManager = null;
     this.listeners = [];
   };
 
   this._addListener = function(element,e,func){
     this.listeners.push({'element': element,'event': e,'func': func});
-    element.addEventListener(e,func);
+    //element.addEventListener(e,func);
   };
 
   this._removeListener = function(element,e,func){
@@ -117,6 +116,35 @@ SceneNode.prototype.RemoveNode = function(node){
         return;
       }
     }
+  }
+};
+
+SceneNode.prototype.DisableListeners = function(ignoreArray){
+
+  var l = this.listeners;
+  for (var i = 0; i < l.length; i++) {
+    var c = l[i];
+    var found = false;
+    if (ignoreArray) {
+      console.log('ignore array');
+      for (var j = 0; j < ignoreArray.length; j++) {
+        if (ignoreArray[j] === c.event) {
+          found = true;
+        }
+      }
+    }
+    if (found) {
+      continue;
+    }
+    c.element.removeEventListener(c.event,c.func);
+  }
+};
+
+SceneNode.prototype.EnableListeners = function(){
+  var l = this.listeners;
+  for (var i = 0; i < l.length; i++) {
+    var c = l[i];
+    c.element.addEventListener(c.event,c.func);
   }
 };
 

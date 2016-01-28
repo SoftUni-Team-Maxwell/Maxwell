@@ -54,5 +54,9 @@ Rect.prototype = {
     var yIn = this._y <= y && this._y + this._height >= y;
 
     return xIn && yIn;
+  },
+  Clone: function(){
+    var result = new Rect(this._x,this._y,this._width,this._height);
+    return result;
   }
 };

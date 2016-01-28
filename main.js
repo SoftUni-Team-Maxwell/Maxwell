@@ -53,6 +53,10 @@ function init() {
   ASSETMANAGER.QueueToLoadTexture('tomato', 'textures/tomato.png');
   ASSETMANAGER.QueueToLoadTexture('blockTrap', 'textures/blockTrap.png');
   ASSETMANAGER.QueueToLoadTexture('lineTrap', 'textures/lineTrap.png');
+  ASSETMANAGER.QueueToLoadTexture('Inspix', 'textures/inspix.png');
+  ASSETMANAGER.QueueToLoadTexture('Bojidar', 'textures/bojidar.png');
+  ASSETMANAGER.QueueToLoadTexture('Vasko', 'textures/vasko.png');
+  ASSETMANAGER.QueueToLoadTexture('Ivaylo', 'textures/ivailo.png');
   ASSETMANAGER.QueueToLoadSound('pop', 'sounds/pop1.ogg');
   ASSETMANAGER.QueueToLoadSound('click', 'sounds/menuClick.ogg');
   ASSETMANAGER.QueueToLoadSound('select', 'sounds/menuSelect.mp3');

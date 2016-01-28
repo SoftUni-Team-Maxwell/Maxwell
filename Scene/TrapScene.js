@@ -7,7 +7,7 @@ function TrapScene(glContext){
     this.globalOptions = {
         'rotation': 0,
         'color': 0xffffffff,
-        'depth': 20
+        'depth': 1
     };
 }
 

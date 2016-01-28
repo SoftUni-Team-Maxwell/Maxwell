@@ -8,15 +8,21 @@ function SceneManager(glContext) {
   this._isTransitioning = false;
 
   this._changeScene = function(scene){
-    if (this._currentTransition) {
-      this._currentTransition.Start();
-      this._nextScene = scene;
-      this._isTransitioning = true;
+  if (this._currentTransition) {
+    this._currentTransition.Start();
+    this._nextScene = scene;
+    this._isTransitioning = true;
+  }
+  else{
+    if (this._currentScene) {
+      this._currentScene.DisableListeners();
     }
-    else{
-      this._currentScene = scene;
-    }
-  };
+    this._currentScene = scene;
+    this._currentScene.sceneManager = this;
+    this._currentScene.EnableListeners();
+
+  }
+};
 
 }
 SceneManager.prototype = {
@@ -49,7 +55,12 @@ SceneManager.prototype.Update = function(delta){
     this._currentTransition.Update(delta);
     if (this._currentTransition.finished) {
       this._isTransitioning = false;
+      if (this._currentScene) {
+        this._currentScene.DisableListeners();
+      }
       this._currentScene = this._nextScene;
+      this._currentScene.sceneManager = this;
+      this._currentScene.EnableListeners();
     }
   }
   this._currentScene.Update(delta);
