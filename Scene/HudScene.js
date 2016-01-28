@@ -6,7 +6,7 @@ function HudScene(glContext){
   this.pauseButton = null;
   this.mousePosition = null;
   this.font = null;
-  this.pausedFont = null;
+  this.gameOverFont = null;
   this.fontOptions = {
     scaleX : 0.55,
     scaleY : 0.55,
@@ -69,8 +69,8 @@ HudScene.prototype.Init = function(){
   var click = new Sprite(new Vec3(0,0,-100),new Vec2(50,50),ASSETMANAGER.textures.pauseButton);
   click.color = 0xffaaaaaa;
   this.font = ASSETMANAGER.fonts.default;
-  this.pausedFont = ASSETMANAGER.fonts.cooperB;
-  this.pauseOptions.sizeX = this.pausedFont.MeasureString('Paused').x;
+  this.gameOverFont = ASSETMANAGER.fonts.cooperB;
+  this.pauseOptions.sizeX = this.gameOverFont.MeasureString('Paused').x;
   this.optionsButton = new Button(normal,hover,click);
   this.optionsButton.depth = 100;
   this.optionsButton.position = new Vec3(CANVAS.width - 55,CANVAS.height - 55,100);
@@ -106,11 +106,25 @@ HudScene.prototype.DrawSelf = function(batch){
   this.optionsButton.Draw(batch);
   if (this.transitioning) {
     self.gl.defaultFontShader.setUniformf(1, self.gl.defaultFontShader.uLocations.uFade);
-    batch.drawString(ASSETMANAGER.fonts.cooperB,'Paused',CANVAS.width/2 - (this.pauseOptions.sizeX * 1.25) / 2,350,this.pauseOptions);
+    if(self.parent.gameOver){
+      batch.drawString(ASSETMANAGER.fonts.cooperB,'Game Over',CANVAS.width/2 - (this.pauseOptions.sizeX * 1.25) / 2,350,this.pauseOptions);
+    }
+    else{
+      batch.drawString(ASSETMANAGER.fonts.cooperB,'Paused',CANVAS.width/2 - (this.pauseOptions.sizeX * 1.25) / 2,350,this.pauseOptions);
+    }
   }
 };
 
+
 HudScene.prototype.UpdateSelf = function(delta){
+  var self = this;
+  if(self.parent.gameOver){
+    this.pauseOptions.sizeX = this.gameOverFont.MeasureString('Game Over').x;
+    self.transitioning = true;
+    self.transitionFadeIn.Stop();
+    self.transitionFadeOut.CurrentPosition = self.transitionFadeIn.CurrentPosition;
+    self.transitionFadeOut.Restart();
+  }
   if (this.transitionFadeIn.active && !this.transitionFadeIn.finished) {
     this.transitionFadeIn.Update(delta);
   }

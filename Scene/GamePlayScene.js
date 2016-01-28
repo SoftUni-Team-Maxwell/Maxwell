@@ -12,6 +12,7 @@ function GamePlayScene(glContext, canvas) {
   this.pickups = null;
   this.traps = null;
   this.pause = false;
+  this.gameOver = false;
   this.camera = new Camera(new Mat4(1));
   this.speed = 4;
   this.playback = false;
@@ -171,6 +172,10 @@ GamePlayScene.prototype.UpdateSelf = function(delta) {
     this.transition.Start();
     this.playback = true;
     ASSETMANAGER.PlaySong('gameplay', true, 1000, 1000);
+  }
+  if (this.gameOver) {
+    this
+    return;
   }
   if (this.pause) {
     return;
